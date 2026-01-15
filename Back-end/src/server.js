@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { ENV } from "./lib/env.js";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import path from "path";
@@ -10,10 +10,10 @@ const __dirname = path.resolve();
 app.use(express.json()); //req.body
 
 app.use("/api/auth", authRoutes);
-const PORT = process.env.PORT;
+const PORT = ENV.PORT;
 
 // Make web ready for deployment
-if (process.env.NODE_ENV === "production") {
+if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../Front-end/dist")));
 
   app.get("*", (_, res) => {
