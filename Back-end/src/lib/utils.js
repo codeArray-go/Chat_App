@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
+import { ENV } from "./env";
 
 export const genrateToken = (userID, res) => {
-  const { JWT_SECRET, NODE_ENV } = process.env;
+  const { JWT_SECRET, NODE_ENV } = ENV;
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not set");
   }
