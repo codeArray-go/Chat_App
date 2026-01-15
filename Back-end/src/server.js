@@ -10,6 +10,7 @@ const __dirname = path.resolve();
 app.use(express.json()); //req.body
 
 app.use("/api/auth", authRoutes);
+const PORT = process.env.PORT;
 
 // Make web ready for deployment
 if (process.env.NODE_ENV === "production") {
@@ -20,7 +21,16 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
-  connectDB();
-});
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(
+        "Your MongoDB database is connected successfully to port: ",
+        PORT
+      );
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to Database ", err);
+    process.exit(1); // Exit code 1 for error and 0 for fine working.
+  });
