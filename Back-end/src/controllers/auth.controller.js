@@ -40,8 +40,10 @@ export const signup = async (req, res) => {
     });
 
     if (newUser) {
-      genrateToken(newUser._id, res);
-      await newUser.save();
+      // Persist User first and then issue auth cookie
+      const savedUser = await newUser.save();
+      genrateToken(savedUser._id, res);
+
       res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
