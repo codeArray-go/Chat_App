@@ -1,0 +1,22 @@
+{
+  "name": "chat_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --prifix Back-end && npm install --prifix Front-end && npm run build --prifix Front-end",
+    "start": "npm run start --prifix Back-end"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codeArray-go/Chat_App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/codeArray-go/Chat_App/issues"
+  },
+  "homepage": "https://github.com/codeArray-go/Chat_App#readme"
+}
