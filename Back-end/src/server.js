@@ -1,7 +1,8 @@
 import { ENV } from "./lib/env.js";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
+import messageRoute from "./routes/message.route.js";
 import path from "path";
 import { connectDB } from "./lib/db.js";
 
@@ -12,6 +13,8 @@ app.use(express.json()); //req.body
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoute);
+
 const PORT = ENV.PORT;
 
 // Make web ready for deployment
