@@ -55,7 +55,7 @@ function SignUpPage() {
                           setFormData({ ...formData, fullName: e.target.value })
                         }
                         className="input"
-                        placeholder="John Doe"
+                        placeholder="Billu Bhasanda"
                       />
                     </div>
                   </div>
@@ -73,7 +73,7 @@ function SignUpPage() {
                           setFormData({ ...formData, email: e.target.value })
                         }
                         className="input"
-                        placeholder="johndoe@gmail.com"
+                        placeholder="billubhasanda00@gmail.com"
                       />
                     </div>
                   </div>
