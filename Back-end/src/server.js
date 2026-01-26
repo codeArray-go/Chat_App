@@ -10,7 +10,11 @@ import { connectDB } from "./lib/db.js";
 const app = express();
 const __dirname = path.resolve();
 
-app.use(express.json()); //req.body
+/* ---------- BODY PARSERS ---------- */
+app.use(express.json({ limit: "20mb" })); // req.body
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+
+/* ---------- CORS ---------- */
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
@@ -19,7 +23,7 @@ app.use("/api/messages", messageRoute);
 
 const PORT = ENV.PORT;
 
-// Make web ready for deployment
+/* ---------- For deployment ---------- */
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../Front-end/dist")));
 
