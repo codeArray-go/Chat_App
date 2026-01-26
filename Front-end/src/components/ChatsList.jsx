@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import NoChatsFound from "./NoChatsFound";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
-import { UseChatStore } from "../store/useChatStore";
+import { UseChatStore } from "../store/UseChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ChatsList = () => {
   const { getMyChatPartners, chats, setSelectedUser, isUserLoading } =
     UseChatStore();
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getMyChatPartners();
@@ -25,12 +27,13 @@ const ChatsList = () => {
           {" "}
           <div className="flex items-center gap-3">
             <div
-            // className={`avatar ${onlineUsers.includes(chat._id) ? "online" : "offline"}`}
+              className={`avatar ${onlineUsers.includes(chat._id) ? "avatar-online" : "avatar-offline"}`}
             >
-              <div className="size-12 rounded-full">
+              <div className="size-12 rounded-full overflow-hidden">
                 <img
                   src={chat.profilePic || "/avatar.png"}
                   alt={chat.fullName}
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import { UseChatStore } from "../store/useChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
@@ -10,12 +10,19 @@ const ChatContainer = () => {
   const { selectedUser, messages, getMessageByUserId, isMessageLoading } =
     UseChatStore();
   const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
   useEffect(() => {
     if (!selectedUser?._id) return;
 
     getMessageByUserId(selectedUser._id);
   }, [selectedUser, getMessageByUserId]);
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <>
@@ -29,13 +36,13 @@ const ChatContainer = () => {
                 className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
               >
                 <div
-                  className={`chat-bubble relative ${msg.senderId === authUser._id ? "bg-cyan-600 text-white" : "bg-slate-800 text-slate-200"}`}
+                  className={`chat-bubble relative ${msg.senderId === authUser._id ? "bg-cyan-600 text-white rounded-br-none" : "bg-slate-800 text-slate-200 rounded-bl-none"} rounded-2xl`}
                 >
                   {msg.image && (
                     <img
                       src={msg.image}
                       alt="Shared"
-                      className="rounded-lg h-48 object-cover"
+                      className="rounded-lg mt-1.5 h-48 object-cover"
                     />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
@@ -48,6 +55,7 @@ const ChatContainer = () => {
                 </div>
               </div>
             ))}
+            <div ref={messageEndRef} />
           </div>
         ) : isMessageLoading ? (
           <MessagesLoadingSkeleton />
