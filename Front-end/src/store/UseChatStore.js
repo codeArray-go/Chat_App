@@ -80,4 +80,25 @@ export const UseChatStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Something went wrong.");
     }
   },
+
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
+
+    const socket = useAuthStore.getState().socket;
+
+    socket.on("newMessage", (newMessage) => {
+      const isMessageSendFromSelectedUser =
+        newMessage.senderId == selectedUser._id;
+      if (!isMessageSendFromSelectedUser) return;
+
+      const currentUserMessages = get().messages;
+      set({ messages: [...currentUserMessages, newMessage] });
+    });
+  },
+
+  unsubsctibeToMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
+  },
 }));
