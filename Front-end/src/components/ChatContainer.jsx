@@ -1,14 +1,21 @@
 import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
-import { UseChatStore } from "../store/useChatStore";
+import { UseChatStore } from "../store/UseChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
 import { useAuthStore } from "../store/useAuthStore";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 import MessageInput from "./MessageInput";
 
 const ChatContainer = () => {
-  const { selectedUser, messages, getMessageByUserId, isMessageLoading } =
-    UseChatStore();
+  const {
+    selectedUser,
+    messages,
+    getMessageByUserId,
+    isMessageLoading,
+    subscribeToMessages,
+    unsubsctibeToMessages,
+  } = UseChatStore();
+
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
@@ -16,7 +23,16 @@ const ChatContainer = () => {
     if (!selectedUser?._id) return;
 
     getMessageByUserId(selectedUser._id);
-  }, [selectedUser, getMessageByUserId]);
+    subscribeToMessages();
+
+    // cleanUp
+    return () => unsubsctibeToMessages();
+  }, [
+    selectedUser,
+    getMessageByUserId,
+    subscribeToMessages,
+    unsubsctibeToMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current) {
