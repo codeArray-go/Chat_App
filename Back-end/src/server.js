@@ -6,16 +6,18 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
 import path from "path";
 import { connectDB } from "./lib/db.js";
+import { app, server } from "./lib/socket.js";
 
-const app = express();
 const __dirname = path.resolve();
 
 /* ---------- BODY PARSERS ---------- */
-app.use(express.json({ limit: "20mb" })); // req.body
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+app.use(express.json({ limit: "15mb" })); // req.body
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 /* ---------- CORS ---------- */
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(
+  cors({ origin: [ENV.CLIENT_URL, ENV.CLIENT_URL_2], credentials: true }),
+);
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
@@ -34,7 +36,7 @@ if (ENV.NODE_ENV === "production") {
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(
         "Your MongoDB database is connected successfully to port: ",
         PORT,
