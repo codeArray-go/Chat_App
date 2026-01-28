@@ -41,29 +41,57 @@ const ChatContainer = () => {
   }, [messages]);
 
   return (
-    <>
+    <div className="h-full flex flex-col">
+      {/* Header */}
       <ChatHeader />
-      <div className="flex-1 px-6 overflow-y-auto py-8">
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2">
         {messages.length > 0 && !isMessageLoading ? (
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
             {messages.map((msg) => (
               <div
                 key={msg._id}
-                className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                className={`chat ${
+                  msg.senderId === authUser._id ? "chat-end" : "chat-start"
+                }`}
               >
                 <div
-                  className={`chat-bubble relative ${msg.senderId === authUser._id ? "bg-cyan-600 text-white rounded-br-none" : "bg-slate-800 text-slate-200 rounded-bl-none"} rounded-2xl`}
+                  className={`
+                chat-bubble relative rounded-2xl
+                px-3 py-2 sm:px-4 sm:py-2.5
+                max-w-[85%] sm:max-w-[70%]
+                wrap-break-word
+                ${
+                  msg.senderId === authUser._id
+                    ? "bg-cyan-600 text-white rounded-br-none"
+                    : "bg-slate-800 text-slate-200 rounded-bl-none"
+                }
+              `}
                 >
+                  {/* Image */}
                   {msg.image && (
                     <img
                       src={msg.image}
                       alt="Shared"
-                      className="rounded-lg mt-1.5 h-48 object-cover"
+                      className="
+                    rounded-lg mt-1.5
+                    max-h-60 sm:max-h-72
+                    w-full object-cover
+                  "
                     />
                   )}
-                  {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
-                    {new Date(msg.createdAt).toLocaleTimeString(undefined, {
+
+                  {/* Text */}
+                  {msg.text && (
+                    <p className="mt-1 text-sm sm:text-base leading-relaxed">
+                      {msg.text}
+                    </p>
+                  )}
+
+                  {/* Time */}
+                  <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -79,8 +107,10 @@ const ChatContainer = () => {
           <NoChatHistoryPlaceholder name={selectedUser.fullName} />
         )}
       </div>
+
+      {/* Input */}
       <MessageInput />
-    </>
+    </div>
   );
 };
 

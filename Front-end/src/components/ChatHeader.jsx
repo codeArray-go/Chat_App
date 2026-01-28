@@ -1,12 +1,13 @@
 import { XIcon } from "lucide-react";
 import { UseChatStore } from "../store/UseChatStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 
 function ChatHeader() {
   const { selectedUser, setSelectedUser } = UseChatStore();
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(selectedUser._id);
+  const closeRef = useRef(null);
 
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -43,8 +44,11 @@ function ChatHeader() {
         </div>
       </div>
 
-      <button onClick={() => setSelectedUser(null)}>
-        <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
+      <button
+        className="hover:bg-[rgba(255,255,255,0.08)] rounded-full p-2.5"
+        onClick={() => setSelectedUser(null)}
+      >
+        <XIcon ref={closeRef} className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
       </button>
     </div>
   );
