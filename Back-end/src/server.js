@@ -4,11 +4,11 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
-import path from "path";
+// import path from "path";
 import { connectDB } from "./lib/db.js";
 import { app, server } from "./lib/socket.js";
 
-const __dirname = path.resolve();
+// const __dirname = path.resolve();
 
 /* ---------- BODY PARSERS ---------- */
 app.use(express.json({ limit: "15mb" })); // req.body
@@ -26,13 +26,13 @@ app.use("/api/messages", messageRoute);
 const PORT = ENV.PORT;
 
 /* ---------- For deployment ---------- */
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../Front-end/dist")));
+// if (ENV.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../Front-end/dist")));
 
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../Front-end", "dist", "index.html"));
-  });
-}
+//   app.get("*", (_, res) => {
+//     res.sendFile(path.join(__dirname, "../Front-end", "dist", "index.html"));
+//   });
+// }
 
 connectDB()
   .then(() => {
