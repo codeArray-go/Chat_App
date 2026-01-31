@@ -2,25 +2,53 @@ import { useRef, useState } from "react";
 import { UseChatStore } from "../store/UseChatStore";
 import { ImageIcon, SendIcon, XIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../store/useAuthStore";
 
 const MessageInput = () => {
+  const { selectedUser } = UseChatStore();
+  const { socket, authUser } = useAuthStore();
+
   const [text, setText] = useState("");
   const [imgPreview, setImgPreview] = useState(null);
   const fileInputRef = useRef(null);
   const { sendMessage } = UseChatStore();
+  const inputRef = useRef(null);
 
-  const handleSendMessage = (e) => {
+  const handleTyping = (e) => {
+    setText(e.target.value);
+
+    // If user clears input completely, stop typing immediately
+    if (e.target.value.trim() === "") {
+      socket.emit("stopTyping", selectedUser._id);
+      return;
+    }
+  };
+
+  // Immediate stop if they click outside
+  const handleBlur = () => {
+    socket.emit("stopTyping", selectedUser._id);
+  };
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imgPreview) return;
 
-    sendMessage({
-      text: text.trim(),
-      image: imgPreview,
-    });
+    socket.emit("stopTyping", selectedUser._id);
 
-    setText("");
-    setImgPreview("");
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    try {
+      await sendMessage({
+        text: text.trim(),
+        image: imgPreview,
+      });
+
+      // Cleanup
+      setText("");
+      setImgPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      inputRef.current?.focus();
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   };
 
   /* ---------- IMAGE UPLOAD BUTTON FUNCTION ---------- */
@@ -39,6 +67,10 @@ const MessageInput = () => {
   const removeImage = () => {
     setImgPreview("");
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleKeyDown = () => {
+    socket.emit("typing", selectedUser._id);
   };
 
   return (
@@ -84,8 +116,11 @@ const MessageInput = () => {
         {/* Text input */}
         <input
           type="text"
+          ref={inputRef}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={handleTyping}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
           placeholder="Type your message..."
           className="
         flex-1
