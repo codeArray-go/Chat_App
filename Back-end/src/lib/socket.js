@@ -38,7 +38,16 @@ io.on("connection", (socket) => {
     const receiverSocketId = getRecieverSocketid(receiverId);
 
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("typing", socket.userId);
+      io.to(receiverSocketId).emit("typing", userId);
+    }
+  });
+
+  // MESSAGE SEEN OR NOT
+  socket.on("markMessagesAsSeen", ({ messageSenderId, myId }) => {
+    const senderSocketId = getRecieverSocketid(messageSenderId);
+
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("messagesSeenByPeer", myId);
     }
   });
 
@@ -46,7 +55,7 @@ io.on("connection", (socket) => {
   socket.on("stopTyping", (receiverId) => {
     const receiverSocketId = getRecieverSocketid(receiverId);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("stopTyping", socket.userId);
+      io.to(receiverSocketId).emit("stopTyping", userId);
     }
   });
 

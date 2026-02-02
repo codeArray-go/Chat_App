@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import { UseChatStore } from "../store/UseChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
@@ -14,14 +14,26 @@ const ChatContainer = () => {
     isMessageLoading,
     subscribeToMessages,
     unsubscribeToMessages,
-    messageSeen,
     isTyping,
     typingUserId,
-    messageSendByUser,
+    lastMessageIsSeen,
   } = UseChatStore();
 
-  const { authUser } = useAuthStore();
+  const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedUser?._id && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+
+      if (lastMsg.senderId === selectedUser._id) {
+        socket.emit("markMessagesAsSeen", {
+          messageSenderId: selectedUser._id,
+          myId: authUser._id,
+        });
+      }
+    }
+  }, [selectedUser, messages, socket]);
 
   useEffect(() => {
     if (!selectedUser?._id) return;
@@ -103,7 +115,7 @@ const ChatContainer = () => {
                   !msg.isOptimistic &&
                   index === messages.length - 1 && (
                     <p className="text-gray-500 text-sm text-right">
-                      {messageSeen
+                      {lastMessageIsSeen
                         ? "Seen"
                         : `Sent at ${new Date(msg.createdAt).toLocaleTimeString(
                             [],

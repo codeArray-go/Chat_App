@@ -13,6 +13,7 @@ export const UseChatStore = create((set, get) => ({
   isMessageLoading: false,
   isTyping: false,
   typingUserId: null,
+  lastMessageIsSeen: false,
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
@@ -92,7 +93,7 @@ export const UseChatStore = create((set, get) => ({
   },
 
   subscribeToMessages: () => {
-    const { selectedUser, typingUserId, isTyping, messageSendByUser } = get();
+    const { selectedUser, typingUserId, isTyping, messageSenderId } = get();
     if (!selectedUser) return;
 
     const socket = useAuthStore.getState().socket;
@@ -104,11 +105,23 @@ export const UseChatStore = create((set, get) => ({
     });
 
     socket.on("typing", (senderId) => {
-      set({ isTyping: true, typingUserId: senderId });
+      set({
+        isTyping: true,
+        typingUserId: senderId,
+      });
     });
 
     socket.on("stopTyping", () => {
       set({ isTyping: false, typingUserId: null });
+    });
+
+    // 3. SEEN LISTENER (Fixed)
+    socket.on("messagesSeenByPeer", (peerId) => {
+      const { selectedUser, lastMessageIsSeen } = get();
+
+      if (selectedUser && selectedUser._id === peerId) {
+        set({ lastMessageIsSeen: true });
+      }
     });
   },
 

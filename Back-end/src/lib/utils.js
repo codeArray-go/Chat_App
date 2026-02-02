@@ -11,12 +11,23 @@ export const genrateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
+  // FOR DEVELOPMENT :-
+
+  // res.cookie("jwt", token, {
+  //   maxAge: 7 * 24 * 60 * 60 * 1000, //this is in millisecond
+  //   httpOnly: true, // prevent XSS attacks: cross-site scripting
+  //   sameSite: "strict", //CSRF attacks
+  //   // sameSite: "none",
+  //   // secure: true, // for production purpose
+  //   path: "/",
+  // });
+
+  // FOR PRODUCTION:-
   res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, //this is in millisecond
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true, // prevent XSS attacks: cross-site scripting
-    // sameSite: "strict", //CSRF attacks
-    sameSite: "none", // for deployment of different platforms
-    secure: true, // for production purpose
+    sameSite: "none",
+    secure: true,
     path: "/",
   });
 
