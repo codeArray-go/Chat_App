@@ -56,14 +56,12 @@ const ChatContainer = () => {
   }, [messages, isTyping]);
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
+    <div className="flex flex-col h-full bg-[#020618]">
       <ChatHeader />
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-            {/* 1. RENDER MESSAGE HISTORY */}
             {messages.map((msg, index) => (
               <div key={msg._id}>
                 <div
@@ -93,14 +91,12 @@ const ChatContainer = () => {
                       />
                     )}
 
-                    {/* Text */}
                     {msg.text && (
                       <p className="mt-1 text-sm sm:text-base leading-relaxed">
                         {msg.text}
                       </p>
                     )}
 
-                    {/* Time */}
                     <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
                       {new Date(msg.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
