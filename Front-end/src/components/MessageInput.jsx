@@ -6,7 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 const MessageInput = () => {
   const { selectedUser } = UseChatStore();
-  const { socket, authUser } = useAuthStore();
+  const { socket } = useAuthStore();
 
   const [text, setText] = useState("");
   const [imgPreview, setImgPreview] = useState(null);
@@ -36,15 +36,17 @@ const MessageInput = () => {
     socket.emit("stopTyping", selectedUser._id);
 
     try {
+      
+      // Cleanup
+      setText("");
+      setImgPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+
       await sendMessage({
         text: text.trim(),
         image: imgPreview,
       });
 
-      // Cleanup
-      setText("");
-      setImgPreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
       inputRef.current?.focus();
     } catch (error) {
       console.error("Failed to send message:", error);
