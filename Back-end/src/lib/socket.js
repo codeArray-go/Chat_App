@@ -3,6 +3,7 @@ import http from "http";
 import express from "express";
 import { ENV } from "./env.js";
 import { socketAuthMiddleware } from "../middileware/socket.auth.middleware.js";
+import Message from "../models/Message.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -14,16 +15,15 @@ const io = new Server(server, {
   },
 });
 
-// Apply authentication middleware to all socket connections
 io.use(socketAuthMiddleware);
 
-// Function to check if user is online or not
-export function getRecieverSocketid(userId) {
+// IF USER IS ONLINE OR NOT
+export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
 
-// Thisis for storing online users
-const userSocketMap = {}; // {userId: SocketId}
+// STORE ONLINE USERS
+const userSocketMap = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected.", socket.user.fullName);
@@ -33,9 +33,9 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  // Listen for "typing" event from client
+  // LISTEN TO TYPING MESSAGE FROM CLIENT
   socket.on("typing", (receiverId) => {
-    const receiverSocketId = getRecieverSocketid(receiverId);
+    const receiverSocketId = getReceiverSocketId(receiverId);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("typing", userId);
@@ -43,17 +43,44 @@ io.on("connection", (socket) => {
   });
 
   // MESSAGE SEEN OR NOT
-  socket.on("markMessagesAsSeen", ({ messageSenderId, myId }) => {
-    const senderSocketId = getRecieverSocketid(messageSenderId);
+  socket.on(
+    "markMessagesAsSeen",
+    async ({ messageSenderId, myId, lastSeenMessageId }) => {
+      const alreadySeen = await Message.exists({
+        senderId: messageSenderId,
+        receiverId: myId,
+        _id: { $lte: lastSeenMessageId },
+        isSeen: false,
+      });
 
-    if (senderSocketId) {
-      io.to(senderSocketId).emit("messagesSeenByPeer", myId);
-    }
-  });
+      if (!alreadySeen) return;
+      try {
+        if (!lastSeenMessageId) return;
 
-  // It will handle typing stop
+        await Message.updateMany(
+          {
+            senderId: messageSenderId,
+            receiverId: myId,
+            _id: { $lte: lastSeenMessageId },
+            isSeen: false,
+          },
+          { $set: { isSeen: true } },
+        );
+
+        const senderSocketId = getReceiverSocketId(messageSenderId);
+
+        if (senderSocketId) {
+          io.to(senderSocketId).emit("messagesSeenByPeer", myId);
+        }
+      } catch (err) {
+        console.error("Error updating seen messages:", err);
+      }
+    },
+  );
+
+  // STOP TYPING ANIMATION
   socket.on("stopTyping", (receiverId) => {
-    const receiverSocketId = getRecieverSocketid(receiverId);
+    const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("stopTyping", userId);
     }

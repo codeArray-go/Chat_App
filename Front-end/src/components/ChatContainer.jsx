@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import ChatHeader from "./ChatHeader";
 import { UseChatStore } from "../store/UseChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
@@ -16,24 +16,24 @@ const ChatContainer = () => {
     unsubscribeToMessages,
     isTyping,
     typingUserId,
-    lastMessageIsSeen,
   } = UseChatStore();
 
   const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (selectedUser?._id && messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
+    if (!selectedUser?._id || messages.length === 0) return;
 
-      if (lastMsg.senderId === selectedUser._id) {
-        socket.emit("markMessagesAsSeen", {
-          messageSenderId: selectedUser._id,
-          myId: authUser._id,
-        });
-      }
+    const lastMsg = messages[messages.length - 1];
+
+    if (lastMsg.senderId === selectedUser._id && !lastMsg.isSeen) {
+      socket.emit("markMessagesAsSeen", {
+        messageSenderId: selectedUser._id,
+        myId: authUser._id,
+        lastSeenMessageId: lastMsg._id,
+      });
     }
-  }, [selectedUser, messages, socket]);
+  }, [messages, selectedUser, socket, authUser]);
 
   useEffect(() => {
     if (!selectedUser?._id) return;
@@ -54,6 +54,18 @@ const ChatContainer = () => {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
+
+  const msgSentTime = (msg) => {
+    return new Date(msg).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const lastSentMessageId = useMemo(() => {
+    return [...messages].reverse().find((m) => m.senderId === authUser._id)
+      ?._id;
+  }, [messages, authUser._id]);
 
   return (
     <div className="flex flex-col h-full bg-[#020618]">
@@ -107,21 +119,13 @@ const ChatContainer = () => {
                 </div>
 
                 {/* Seen or Sent Status  */}
-                {msg.senderId === authUser._id &&
-                  !msg.isOptimistic &&
-                  index === messages.length - 1 && (
-                    <p className="text-gray-500 text-sm text-right">
-                      {lastMessageIsSeen
-                        ? "Seen"
-                        : `Sent at ${new Date(msg.createdAt).toLocaleTimeString(
-                            [],
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            },
-                          )}`}
-                    </p>
-                  )}
+                {msg._id === lastSentMessageId && (
+                  <p className="text-gray-500 text-sm text-right">
+                    {msg.isSeen
+                      ? "Seen"
+                      : `Sent at ${msgSentTime(msg.createdAt)}`}
+                  </p>
+                )}
               </div>
             ))}
 

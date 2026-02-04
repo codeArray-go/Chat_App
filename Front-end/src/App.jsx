@@ -36,7 +36,6 @@ const App = () => {
       <Toaster />
     </div>
   );
-  
 };
 
 export default App;

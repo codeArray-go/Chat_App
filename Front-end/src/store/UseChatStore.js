@@ -13,7 +13,6 @@ export const UseChatStore = create((set, get) => ({
   isMessageLoading: false,
   isTyping: false,
   typingUserId: null,
-  lastMessageIsSeen: false,
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
@@ -31,14 +30,14 @@ export const UseChatStore = create((set, get) => ({
   },
 
   getMyChatPartners: async () => {
-    set({ isUsersLoading: true });
+    set({ isUserLoading: true });
     try {
       const res = await axiosInstance.get("/messages/chats");
       set({ chats: res.data });
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      set({ isUsersLoading: false });
+      set({ isUserLoading: false });
     }
   },
 
@@ -67,6 +66,7 @@ export const UseChatStore = create((set, get) => ({
       text: messageData.text,
       image: messageData.image,
       createdAt: new Date().toISOString(),
+      isSeen: false,
       isOptimistic: true,
     };
     set((state) => ({
@@ -93,11 +93,15 @@ export const UseChatStore = create((set, get) => ({
   },
 
   subscribeToMessages: () => {
-    const { selectedUser, typingUserId, isTyping, messageSenderId } = get();
-    if (!selectedUser) return;
+    const { selectedUser } = get();
 
+    if (!selectedUser) return;
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
+
+    socket.off("newMessage");
+    socket.off("typing");
+    socket.off("stopTyping");
 
     socket.on("newMessage", (newMessage) => {
       const currentUserMessages = get().messages;
@@ -105,28 +109,37 @@ export const UseChatStore = create((set, get) => ({
     });
 
     socket.on("typing", (senderId) => {
+      const { typingUserId, isTyping } = get();
+
       set({
         isTyping: true,
         typingUserId: senderId,
       });
     });
 
-    socket.on("stopTyping", () => {
-      set({ isTyping: false, typingUserId: null });
+    socket.on("messagesSeenByPeer", (peerId) => {
+      if (!peerId) return;
+
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg.receiverId === peerId ? { ...msg, isSeen: true } : msg,
+        ),
+      }));
     });
 
-    // 3. SEEN LISTENER (Fixed)
-    socket.on("messagesSeenByPeer", (peerId) => {
-      const { selectedUser, lastMessageIsSeen } = get();
+    socket.on("stopTyping", () => {
+      const { typingUserId, isTyping } = get();
 
-      if (selectedUser && selectedUser._id === peerId) {
-        set({ lastMessageIsSeen: true });
-      }
+      set({ isTyping: false, typingUserId: null });
     });
   },
 
   unsubscribeToMessages: () => {
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
     socket.off("newMessage");
+    socket.off("typing");
+    socket.off("stopTyping");
   },
 }));

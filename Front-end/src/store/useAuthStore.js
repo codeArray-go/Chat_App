@@ -21,7 +21,10 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
-      get().connectSocket();
+
+      if (res.data) {
+        get().connectSocket();
+      }
     } catch (error) {
       console.log("Error in authCheck:", error);
       set({ authUser: null });
@@ -37,7 +40,9 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
 
       toast.success("Account created successfully!");
-      get().connectSocket();
+      if (res.data) {
+        get().connectSocket();
+      }
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -52,7 +57,10 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
 
       toast.success("Successfully Logged In.");
-      get().connectSocket();
+
+      if (res.data) {
+        get().connectSocket();
+      }
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {

@@ -25,7 +25,7 @@ app.use("/api/messages", messageRoute);
 
 const PORT = ENV.PORT;
 
-/* ---------- For deployment ---------- */
+/* ---------- For deployment of front end and backend at same place ---------- */
 // if (ENV.NODE_ENV === "production") {
 //   app.use(express.static(path.join(__dirname, "../Front-end/dist")));
 
