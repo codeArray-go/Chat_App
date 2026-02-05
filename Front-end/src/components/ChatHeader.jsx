@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 
 function ChatHeader() {
-  const { selectedUser, setSelectedUser } = UseChatStore();
+  const { selectedUser, setSelectedUser, typingUsers } = UseChatStore();
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(selectedUser._id);
   const closeRef = useRef(null);
@@ -39,7 +39,9 @@ function ChatHeader() {
             {selectedUser.fullName}
           </h3>
           <p className="text-slate-400 text-sm">
-            {isOnline ? "Online" : "Offline"}
+            {isOnline
+              ? `${typingUsers[selectedUser._id] ? "typing..." : "online"}`
+              : "Offline"}
           </p>
         </div>
       </div>
@@ -48,7 +50,10 @@ function ChatHeader() {
         className="hover:bg-[rgba(255,255,255,0.08)] rounded-full p-2.5"
         onClick={() => setSelectedUser(null)}
       >
-        <XIcon ref={closeRef} className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
+        <XIcon
+          ref={closeRef}
+          className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+        />
       </button>
     </div>
   );

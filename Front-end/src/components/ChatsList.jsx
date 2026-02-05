@@ -11,6 +11,7 @@ const ChatsList = () => {
     setSelectedUser,
     isUserLoading,
     selectedUser,
+    typingUsers,
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
 
@@ -26,7 +27,7 @@ const ChatsList = () => {
       {chats.map((chat) => (
         <div
           key={chat._id}
-          className={`tap-effect flex items-center gap-3 p-3 cursor-pointer transition-all rounded-xl  border 
+          className={`tap-effect flex items-center justify-between gap-3 p-3 cursor-pointer transition-all rounded-xl  border 
             ${
               selectedUser?._id === chat._id
                 ? "bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
@@ -48,9 +49,14 @@ const ChatsList = () => {
                 />
               </div>
             </div>
-            <h4 className="text-slate-200 font-medium truncate">
-              {chat.fullName}
-            </h4>
+            <div>
+              <h4 className="text-slate-200 font-medium truncate">
+                {chat.fullName}
+              </h4>
+              {typingUsers[chat._id] && (
+                <p className="text-cyan-400 text-sm">typing...</p>
+              )}
+            </div>
           </div>
         </div>
       ))}

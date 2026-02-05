@@ -15,7 +15,7 @@ const ChatContainer = () => {
     subscribeToMessages,
     unsubscribeToMessages,
     isTyping,
-    typingUserId,
+    typingUsers,
   } = UseChatStore();
 
   const { authUser, socket } = useAuthStore();
@@ -74,7 +74,7 @@ const ChatContainer = () => {
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-            {messages.map((msg, index) => (
+            {messages.map((msg) => (
               <div key={msg._id}>
                 <div
                   className={`chat ${
@@ -130,7 +130,7 @@ const ChatContainer = () => {
             ))}
 
             {/* 2. TYPING INDICATOR  */}
-            {isTyping && typingUserId === selectedUser?._id && (
+            {typingUsers[selectedUser?._id] && (
               <div className="chat chat-start">
                 <div className="chat-bubble bg-gray-800 text-xs italic opacity-50 flex items-center gap-1 rounded-2xl rounded-bl-none px-5 py-3">
                   <span className="loading loading-dots loading-xs"></span>

@@ -6,6 +6,7 @@ import SignUpPage from "./pages/SignupPage";
 import { useAuthStore } from "./store/useAuthStore";
 import PageLoader from "./components/PageLoader";
 import { Toaster } from "react-hot-toast";
+import { UseChatStore } from "./store/UseChatStore";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -13,6 +14,12 @@ const App = () => {
   useEffect(() => {
     useAuthStore.getState().checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (!authUser) return;
+
+    UseChatStore.getState().initTypingListener();
+  }, [authUser]);
 
   if (isCheckingAuth) return <PageLoader />;
 

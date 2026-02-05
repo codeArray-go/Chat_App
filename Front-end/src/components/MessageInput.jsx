@@ -36,7 +36,6 @@ const MessageInput = () => {
     socket.emit("stopTyping", selectedUser._id);
 
     try {
-      
       // Cleanup
       setText("");
       setImgPreview(null);
