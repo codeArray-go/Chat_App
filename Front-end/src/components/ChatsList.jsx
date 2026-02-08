@@ -12,6 +12,7 @@ const ChatsList = () => {
     isUserLoading,
     selectedUser,
     typingUsers,
+    notifications,
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
 
@@ -58,6 +59,11 @@ const ChatsList = () => {
               )}
             </div>
           </div>
+          {notifications[chat._id] > 0 && (
+            <div className="rounded-full border border-green-400 text-xs text-green-500 font-medium px-2 py-0.5">
+              {notifications[chat._id]}
+            </div>
+          )}
         </div>
       ))}
     </>

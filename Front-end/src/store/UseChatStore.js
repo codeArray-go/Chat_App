@@ -12,6 +12,7 @@ export const UseChatStore = create((set, get) => ({
   isUserLoading: false,
   isMessageLoading: false,
   typingUsers: {},
+  notifications: {},
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
@@ -49,6 +50,28 @@ export const UseChatStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       set({ isMessageLoading: false });
+    }
+  },
+
+  getNotification: async () => {
+    try {
+      const res = await axiosInstance.get("/messages/getNoti");
+
+      const response = res.data; // Array
+
+      set((state) => {
+        const updated = { ...state.notifications };
+        response.forEach((element) => {
+          updated[element._id] = element.count;
+        });
+
+        console.log(updated);
+
+        return { notifications: updated };
+      });
+    } catch (error) {
+      toast.error("Something went wrong while fetching notification");
+      console.log(error);
     }
   },
 
@@ -94,15 +117,43 @@ export const UseChatStore = create((set, get) => ({
   subscribeToMessages: () => {
     const { selectedUser } = get();
 
-    if (!selectedUser) return;
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
+    if (!socket || !useAuthStore.getState().authUser) return;
+
     socket.off("newMessage");
+    // socket.off("unreadCount");
+    socket.off("messagesSeenByPeer");
+
+    if (!selectedUser) return;
 
     socket.on("newMessage", (newMessage) => {
-      const currentUserMessages = get().messages;
-      set({ messages: [...currentUserMessages, newMessage] });
+      const { selectedUser } = get();
+
+      if (
+        selectedUser &&
+        (newMessage.senderId === selectedUser._id ||
+          newMessage.receiverId === selectedUser._id)
+      ) {
+        set((state) => ({
+          messages: [...state.messages, newMessage],
+        }));
+      }
+    });
+
+    socket.on("unreadCount", (unreadMessages) => {
+      if (!Array.isArray(unreadMessages)) return;
+
+      set((state) => {
+        const updated = { ...state.notifications };
+
+        unreadMessages.forEach((item) => {
+          updated[item._id] = item.count;
+        });
+
+        return { notifications: updated };
+      });
     });
 
     socket.on("messagesSeenByPeer", (peerId) => {
@@ -111,6 +162,11 @@ export const UseChatStore = create((set, get) => ({
       set((state) => ({
         messages: state.messages.map((msg) =>
           msg.receiverId === peerId ? { ...msg, isSeen: true } : msg,
+        ),
+        notifications: Object.fromEntries(
+          Object.entries(state.notifications).filter(
+            ([senderId]) => senderId !== peerId,
+          ),
         ),
       }));
     });
@@ -142,7 +198,7 @@ export const UseChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
-    socket.off("newMessage");
+    // socket.off("newMessage");
     socket.off("messagesSeenByPeer");
   },
 }));

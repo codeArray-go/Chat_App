@@ -18,6 +18,7 @@ const App = () => {
   useEffect(() => {
     if (!authUser) return;
 
+    UseChatStore.getState().getNotification();
     UseChatStore.getState().initTypingListener();
   }, [authUser]);
 

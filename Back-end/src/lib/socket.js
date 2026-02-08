@@ -17,13 +17,13 @@ const io = new Server(server, {
 
 io.use(socketAuthMiddleware);
 
+// STORE ONLINE USERS
+const userSocketMap = {};
+
 // IF USER IS ONLINE OR NOT
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
-
-// STORE ONLINE USERS
-const userSocketMap = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected.", socket.user.fullName);

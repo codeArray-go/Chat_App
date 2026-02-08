@@ -4,9 +4,9 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
-// import path from "path";
 import { connectDB } from "./lib/db.js";
 import { app, server } from "./lib/socket.js";
+// import path from "path";
 
 // const __dirname = path.resolve();
 
