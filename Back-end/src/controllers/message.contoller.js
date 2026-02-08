@@ -22,6 +22,7 @@ export const getMessagesByUserId = async (req, res) => {
     const myId = req.user._id;
 
     const { id: userToChatId } = req.params;
+
     const message = await Message.find({
       $or: [
         { senderId: myId, receiverId: userToChatId },
@@ -71,7 +72,7 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // send Message in real-time if user is online - socket.io
+    // SENDING MESAAGES IN REAL-TIME IF USER IF ONLINE- SOCKET.IO
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
@@ -84,11 +85,44 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+// GET NOTIFICATION FROM DATABASE
+export const getNotification = async (req, res) => {
+  try {
+    const myId = req.user._id;
+
+    if (!myId) return;
+
+    const unreadMessages = await Message.aggregate([
+      {
+        $match: {
+          receiverId: myId,
+          isSeen: false,
+        },
+      },
+      {
+        $group: {
+          _id: "$senderId",
+          count: { $sum: 1 }, // count per sender
+        },
+      },
+    ]);
+
+    const receiverSocketId = getReceiverSocketId(myId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("unreadCount", unreadMessages);
+    }
+
+    res.status(201).json(unreadMessages);
+  } catch (error) {
+    console.log("Internal Server Error", error);
+  }
+};
+
 export const getChatParameter = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    // find all the message where the logged-in user is either a reciever or a sender.
+    // FIND ALL THE MESSAGE WHERE THE LOGGED-IN USER IS EITHER A RECIEVER OR A SENDER.
     const messages = await Message.find({
       $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
     });
