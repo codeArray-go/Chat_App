@@ -74,24 +74,21 @@ const ChatContainer = () => {
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-            {messages.map((msg) => (
+            {messages.map((msg, idx) => (
               <div key={msg._id}>
                 <div
-                  className={`chat ${
-                    msg.senderId === authUser._id ? "chat-end" : "chat-start"
-                  }`}
+                  className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"
+                    }`}
                 >
                   <div
                     className={`chat-bubble relative rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 max-w-[85%] sm:max-w-[70%] wrap-break-word transition-all duration-300 ease-out
-                ${
-                  msg.senderId === authUser._id
-                    ? `bg-cyan-600 text-white rounded-br-none ${
-                        msg.isOptimistic
+                ${msg.senderId === authUser._id
+                        ? `bg-cyan-600 text-white rounded-br-none ${msg.isOptimistic
                           ? "-translate-x-3 opacity-80"
                           : "translate-x-0"
-                      }`
-                    : "bg-slate-800 text-slate-200 rounded-bl-none"
-                }
+                        }`
+                        : "bg-slate-800 text-slate-200 rounded-bl-none"
+                      }
               `}
                   >
                     {/* Image */}

@@ -43,40 +43,46 @@ io.on("connection", (socket) => {
   });
 
   // MESSAGE SEEN OR NOT
-  socket.on(
-    "markMessagesAsSeen",
-    async ({ messageSenderId, myId, lastSeenMessageId }) => {
-      const alreadySeen = await Message.exists({
+  socket.on("markMessagesAsSeen", async ({ messageSenderId, myId }) => {
+    const alreadySeen = await Message.exists({
+      senderId: messageSenderId,
+      receiverId: myId,
+      isSeen: false,
+    });
+
+    if (!alreadySeen) return;
+    try {
+      await Message.updateMany(
+        {
+          senderId: messageSenderId,
+          receiverId: myId,
+          isSeen: false,
+        },
+        { $set: { isSeen: true } },
+      );
+      const senderSocketId = getReceiverSocketId(messageSenderId);
+
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messagesSeenByPeer", myId);
+      }
+
+      const unreadCount = await Message.countDocuments({
         senderId: messageSenderId,
         receiverId: myId,
-        _id: { $lte: lastSeenMessageId },
         isSeen: false,
       });
 
-      if (!alreadySeen) return;
-      try {
-        if (!lastSeenMessageId) return;
+      if (unreadCount > 0) return;
 
-        await Message.updateMany(
-          {
-            senderId: messageSenderId,
-            receiverId: myId,
-            _id: { $lte: lastSeenMessageId },
-            isSeen: false,
-          },
-          { $set: { isSeen: true } },
-        );
-
-        const senderSocketId = getReceiverSocketId(messageSenderId);
-
-        if (senderSocketId) {
-          io.to(senderSocketId).emit("messagesSeenByPeer", myId);
-        }
-      } catch (err) {
-        console.error("Error updating seen messages:", err);
-      }
-    },
-  );
+      const mySocketId = getReceiverSocketId(myId);
+      io.to(mySocketId).emit("unreadCountUpdateAfterSeen", {
+        sender: messageSenderId,
+        count: unreadCount,
+      });
+    } catch (err) {
+      console.error("Error updating seen messages:", err);
+    }
+  });
 
   // STOP TYPING ANIMATION
   socket.on("stopTyping", (receiverId) => {

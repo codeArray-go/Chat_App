@@ -31,9 +31,21 @@ export const UseChatStore = create((set, get) => ({
 
   getMyChatPartners: async () => {
     set({ isUserLoading: true });
+
     try {
       const res = await axiosInstance.get("/messages/chats");
       set({ chats: res.data });
+
+      const socket = useAuthStore.getState().socket;
+      if (!socket) return;
+
+      if (!socket || !useAuthStore.getState().authUser) return;
+
+      socket.on("unreadCount", ({ sender, count }) => {
+        set((state) => ({
+          notifications: { ...state.notifications, [sender]: count },
+        }));
+      });
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -64,8 +76,6 @@ export const UseChatStore = create((set, get) => ({
         response.forEach((element) => {
           updated[element._id] = element.count;
         });
-
-        console.log(updated);
 
         return { notifications: updated };
       });
@@ -110,7 +120,10 @@ export const UseChatStore = create((set, get) => ({
       return selectedUser._id;
     } catch (error) {
       set({ messages: messages });
-      toast.error(error.response?.data?.message || "Something went wrong.");
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong sending messages.",
+      );
     }
   },
 
@@ -123,7 +136,7 @@ export const UseChatStore = create((set, get) => ({
     if (!socket || !useAuthStore.getState().authUser) return;
 
     socket.off("newMessage");
-    // socket.off("unreadCount");
+    socket.off("unreadCountUpdateAfterSeen");
     socket.off("messagesSeenByPeer");
 
     if (!selectedUser) return;
@@ -142,20 +155,6 @@ export const UseChatStore = create((set, get) => ({
       }
     });
 
-    socket.on("unreadCount", (unreadMessages) => {
-      if (!Array.isArray(unreadMessages)) return;
-
-      set((state) => {
-        const updated = { ...state.notifications };
-
-        unreadMessages.forEach((item) => {
-          updated[item._id] = item.count;
-        });
-
-        return { notifications: updated };
-      });
-    });
-
     socket.on("messagesSeenByPeer", (peerId) => {
       if (!peerId) return;
 
@@ -163,12 +162,17 @@ export const UseChatStore = create((set, get) => ({
         messages: state.messages.map((msg) =>
           msg.receiverId === peerId ? { ...msg, isSeen: true } : msg,
         ),
-        notifications: Object.fromEntries(
-          Object.entries(state.notifications).filter(
-            ([senderId]) => senderId !== peerId,
-          ),
-        ),
       }));
+    });
+
+    socket.on("unreadCountUpdateAfterSeen", ({ sender, count }) => {
+      set((state) => ({
+        notifications: {
+          ...state.notifications,
+          [sender]: count,
+        },
+      }));
+      console.log("notification updated");
     });
   },
 
@@ -198,7 +202,8 @@ export const UseChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
-    // socket.off("newMessage");
+    socket.off("newMessage");
     socket.off("messagesSeenByPeer");
+    socket.off("unreadCountUpdateAfterSeen");
   },
 }));

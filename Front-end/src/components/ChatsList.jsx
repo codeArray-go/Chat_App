@@ -15,10 +15,12 @@ const ChatsList = () => {
     notifications,
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
+  const { authUser, socket } = useAuthStore();
 
   useEffect(() => {
     getMyChatPartners();
   }, [getMyChatPartners]);
+
 
   if (isUserLoading) return <UsersLoadingSkeleton />;
   if (chats.length == 0) return <NoChatsFound />;
@@ -29,10 +31,9 @@ const ChatsList = () => {
         <div
           key={chat._id}
           className={`tap-effect flex items-center justify-between gap-3 p-3 cursor-pointer transition-all rounded-xl  border 
-            ${
-              selectedUser?._id === chat._id
-                ? "bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
-                : "bg-transparent border-slate-800/65 hover:bg-slate-800/70"
+            ${selectedUser?._id === chat._id
+              ? "bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
+              : "bg-transparent border-slate-800/65 hover:bg-slate-800/70"
             }
           `}
           onClick={() => setSelectedUser(chat)}

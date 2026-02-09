@@ -67,15 +67,26 @@ export const sendMessage = async (req, res) => {
       receiverId,
       text,
       image: imageUrl,
-      isSeen,
+      isSeen: false,
     });
 
     await newMessage.save();
 
     // SENDING MESAAGES IN REAL-TIME IF USER IF ONLINE- SOCKET.IO
+    const unreadCount = await Message.countDocuments({
+      senderId: senderId,
+      receiverId: receiverId,
+      isSeen: false,
+    });
+
     const receiverSocketId = getReceiverSocketId(receiverId);
+
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
+      io.to(receiverSocketId).emit("unreadCount", {
+        sender: senderId,
+        count: unreadCount,
+      });
     }
 
     res.status(201).json(newMessage);
@@ -106,11 +117,6 @@ export const getNotification = async (req, res) => {
         },
       },
     ]);
-
-    const receiverSocketId = getReceiverSocketId(myId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("unreadCount", unreadMessages);
-    }
 
     res.status(201).json(unreadMessages);
   } catch (error) {
