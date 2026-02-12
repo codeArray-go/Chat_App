@@ -75,7 +75,7 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="border-t border-slate-700/50 px-2 sm:px-4 py-2">
+    <div className="border-t border-[#2f2f30d0] px-2 sm:px-4 py-2 bg-[#06070ae7]">
       {/* Image preview */}
       {imgPreview && (
         <div className="max-w-3xl mx-auto mb-2 flex items-center">
@@ -109,10 +109,7 @@ const MessageInput = () => {
       {/* Input form */}
       <form
         onSubmit={handleSendMessage}
-        className="
-      max-w-3xl mx-auto
-      flex items-end gap-2 sm:gap-3
-    "
+        className="max-w-3xl mx-auto flex items-end gap-2 sm:gap-3"
       >
         {/* Text input */}
         <input
@@ -123,15 +120,7 @@ const MessageInput = () => {
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           placeholder="Type your message..."
-          className="
-        flex-1
-        bg-slate-800/50
-        border border-slate-700/50
-        rounded-lg
-        px-3 py-2
-        text-sm sm:text-base
-        focus:outline-none focus:ring-1 focus:ring-cyan-500
-      "
+          className="flex-1 bg-[#0d1117] border border-[#2f2f30d0] rounded-lg px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-[#686868]"
         />
 
         {/* Hidden file input */}
@@ -165,11 +154,10 @@ const MessageInput = () => {
           disabled={!text.trim() && !imgPreview}
           className="
         shrink-0
-        bg-linear-to-r from-cyan-500 to-cyan-600
+        bg-[#0d1117]
         text-white
         rounded-lg
         p-2 sm:px-4 sm:py-2
-        hover:from-cyan-600 hover:to-cyan-700
         transition-all
         disabled:opacity-50 disabled:cursor-not-allowed
       "

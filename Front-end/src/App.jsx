@@ -7,6 +7,8 @@ import { useAuthStore } from "./store/useAuthStore";
 import PageLoader from "./components/PageLoader";
 import { Toaster } from "react-hot-toast";
 import { UseChatStore } from "./store/UseChatStore";
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -25,11 +27,19 @@ const App = () => {
   if (isCheckingAuth) return <PageLoader />;
 
   return (
-    <div className="h-screen bg-slate-900 overflow-hidden w-screen">
+    <div className="h-screen overflow-hidden w-screen">
       <Routes>
         <Route
           path="/"
           element={authUser ? <ChatPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/Dashboard"
+          element={authUser ? <Dashboard /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/Home"
+          element={authUser ? <Home /> : <Navigate to={"/Login"} />}
         />
         <Route
           path="/login"

@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, EllipsisVertical, XIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
+  const [openMenu, setOpenMenu] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -46,7 +47,7 @@ function ProfileHeader() {
   };
 
   return (
-    <div className="p-6 border-b border-slate-700/50">
+    <div className="p-6 border-b border-[#2f2f30d0]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* AVATAR */}
@@ -85,14 +86,35 @@ function ProfileHeader() {
         </div>
 
         {/* BUTTONS */}
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center relative">
           {/* LOGOUT BTN */}
-          <button
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-            onClick={logout}
-          >
-            <LogOutIcon className="size-5" />
-          </button>
+          <div onClick={() => { setOpenMenu((prev) => !prev) }} className=" p-2 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer">
+            {!openMenu ? <EllipsisVertical size={20} /> : <XIcon size={20} />}
+          </div>
+
+          {openMenu &&
+
+            <div
+              className="absolute z-10 top-12 right-2 sm:right-0 min-w-44 bg-[#101013] border border-[#444444] rounded-xl shadow-2xl shadow-black/60 p-1.5 text-slate-300 ring-1 ring-white/5 backdrop-blur-sm"
+            >
+              <button
+                onClick={logout}
+                className="group flex items-center justify-between gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-[#2b2b2b] hover:text-white transition-all duration-200 text-sm font-medium"
+              >
+                Logout
+                <LogOutIcon className="size-4 text-slate-500 transition-colors duration-200" />
+              </button>
+
+              <button
+                type="button"
+                className="mt-1 w-full text-left px-3 py-2.5 rounded-lg hover:bg-[#2b2b2b] hover:text-white transition-all duration-200 text-sm font-medium"
+              >
+                Theme
+              </button>
+            </div>
+
+          }
+
         </div>
       </div>
     </div>

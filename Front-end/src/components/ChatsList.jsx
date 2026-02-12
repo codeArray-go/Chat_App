@@ -13,9 +13,9 @@ const ChatsList = () => {
     selectedUser,
     typingUsers,
     notifications,
+    messages
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
-  const { authUser, socket } = useAuthStore();
 
   useEffect(() => {
     getMyChatPartners();
@@ -30,10 +30,9 @@ const ChatsList = () => {
       {chats.map((chat) => (
         <div
           key={chat._id}
-          className={`tap-effect flex items-center justify-between gap-3 p-3 cursor-pointer transition-all rounded-xl  border 
+          className={`tap-effect flex items-center justify-between gap-3 p-3 cursor-pointer transition-all 
             ${selectedUser?._id === chat._id
-              ? "bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
-              : "bg-transparent border-slate-800/65 hover:bg-slate-800/70"
+              ? "bg-[#18181b]" : "bg-transparent hover:bg-[#0d1117]"
             }
           `}
           onClick={() => setSelectedUser(chat)}
@@ -43,7 +42,7 @@ const ChatsList = () => {
             <div
               className={`avatar ${onlineUsers.includes(chat._id) ? "avatar-online" : "avatar-offline"}`}
             >
-              <div className="size-12 rounded-full overflow-hidden">
+              <div className="size-14 rounded-full overflow-hidden">
                 <img
                   src={chat.profilePic || "/avatar.png"}
                   alt={chat.fullName}
@@ -52,12 +51,14 @@ const ChatsList = () => {
               </div>
             </div>
             <div>
-              <h4 className="text-slate-200 font-medium truncate">
+              <h4 className="text-slate-200 text-base font-medium truncate">
                 {chat.fullName}
               </h4>
-              {typingUsers[chat._id] && (
-                <p className="text-cyan-400 text-sm">typing...</p>
-              )}
+              {
+                typingUsers[chat._id] && (
+                  <p className="text-cyan-400 text-sm">typing...</p>
+                )
+              }
             </div>
           </div>
           {notifications[chat._id] > 0 && (

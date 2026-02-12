@@ -19,11 +19,10 @@ function ContactList() {
       {allContact.map((contact) => (
         <div
           key={contact._id}
-          className={`tap-effect flex items-center gap-3 p-3 cursor-pointer transition-all rounded-xl  border 
-            ${
-              selectedUser?._id === contact._id
-                ? "bg-cyan-500/15 border-cyan-500/10 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
-                : "bg-transparent border-slate-800/65 hover:bg-slate-800/70"
+          className={`tap-effect flex items-center gap-3 p-3 cursor-pointer transition-all rounded-xl 
+            ${selectedUser?._id === contact._id
+              ? "bg-[#18181b]"
+              : "bg-transparent hover:bg-[#0d1117]"
             }
           `}
           onClick={() => setSelectedUser(contact)}
