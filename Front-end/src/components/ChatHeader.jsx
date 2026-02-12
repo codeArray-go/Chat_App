@@ -19,8 +19,8 @@ function ChatHeader() {
 
   return (
     <div
-      className="flex justify-between items-center bg-slate-900/30 border-b
-   border-slate-800/40 max-h-21 px-6 flex-1"
+      className="flex justify-between items-center bg-[#06070ae7] border-b
+   border-[#2f2f30d0] max-h-21 px-6 flex-1"
     >
       <div className="flex items-center space-x-3">
         <div

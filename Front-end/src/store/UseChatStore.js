@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
+import { SidebarOpen } from "lucide-react";
 
 export const UseChatStore = create((set, get) => ({
   allContact: [],
@@ -13,7 +14,10 @@ export const UseChatStore = create((set, get) => ({
   isMessageLoading: false,
   typingUsers: {},
   notifications: {},
+  searchedUser: [],
+  sideBarOpen: false,
 
+  setSideBarOpen: (boolVal) => set({ sideBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
 
@@ -26,6 +30,19 @@ export const UseChatStore = create((set, get) => ({
       toast.error(error.response.data.messages);
     } finally {
       set({ isUserLoading: false });
+    }
+  },
+
+  searchInContacts: async (data) => {
+    try {
+      const res = await axiosInstance.get("/messages/search", { params: data });
+      set({ searchedUser: res.data })
+
+    } catch (error) {
+      toast.error("error in Searching");
+      console.log(error);
+    } finally {
+      set({ searchUser: "" })
     }
   },
 
@@ -122,7 +139,7 @@ export const UseChatStore = create((set, get) => ({
       set({ messages: messages });
       toast.error(
         error.response?.data?.message ||
-          "Something went wrong sending messages.",
+        "Something went wrong sending messages.",
       );
     }
   },

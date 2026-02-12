@@ -37,9 +37,23 @@ export const getMessagesByUserId = async (req, res) => {
   }
 };
 
+export const searchUser = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) return;
+
+    const searchQuery = await User.find({ fullName: { $regex: query } })
+
+    res.status(200).json(searchQuery);
+  } catch (error) {
+    console.log("Error in searching", error)
+  }
+}
+
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image, isSeen } = req.body;
+    const { text, image } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 

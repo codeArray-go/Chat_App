@@ -7,15 +7,17 @@ import {
   sendMessage,
   getChatParameter,
   getNotification,
+  searchUser
 } from "../controllers/message.contoller.js";
 
 const router = express.Router();
 
 router.use(arcjetProtection, protectedRoute);
-router.use(protectedRoute);
+// router.use(protectedRoute);
 
 router.get("/contacts", getAllContacts);
 router.get("/chats", getChatParameter);
+router.get("/search", searchUser)
 router.get("/getNoti", getNotification);
 router.get("/:id", getMessagesByUserId);
 router.post("/send/:id", sendMessage);
