@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import { UseChatStore } from "./store/UseChatStore";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
+import SideBar from "./components/sideBar/SideBar"
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -51,6 +52,7 @@ const App = () => {
         />
       </Routes>
 
+      <SideBar />
       <Toaster />
     </div>
   );

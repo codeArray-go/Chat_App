@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import { UseChatStore } from "../store/UseChatStore";
+import { UseChatStore } from "../../store/UseChatStore";
 import { ImageIcon, SendIcon, XIcon } from "lucide-react";
 import toast from "react-hot-toast";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const MessageInput = () => {
   const { selectedUser } = UseChatStore();

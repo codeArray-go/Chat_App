@@ -1,8 +1,8 @@
 import { useEffect, useRef, useMemo } from "react";
 import ChatHeader from "./ChatHeader";
-import { UseChatStore } from "../store/UseChatStore";
+import { UseChatStore } from "../../store/UseChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 import MessageInput from "./MessageInput";
 

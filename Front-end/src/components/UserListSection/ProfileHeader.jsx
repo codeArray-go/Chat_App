@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { LogOutIcon, EllipsisVertical, XIcon } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore"
 
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore();
@@ -47,13 +47,13 @@ function ProfileHeader() {
   };
 
   return (
-    <div className="p-6 border-b border-[#2f2f30d0]">
+    <div className="p-6 border-b border-gray-500/15">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* AVATAR */}
-          <div className="avatar avatar-online">
+          <div className="avatar border-2 border-gray-200/50 rounded-full">
             <button
-              className="size-14 rounded-full overflow-hidden relative group"
+              className="size-14 rounded-full overflow-hidden relative group cursor-pointer"
               onClick={() => fileInputRef.current.click()}
             >
               <img
@@ -75,13 +75,11 @@ function ProfileHeader() {
             />
           </div>
 
-          {/* USERNAME & ONLINE TEXT */}
+          {/* USERNAME */}
           <div>
-            <h3 className="text-slate-200 font-medium text-base max-w-45 truncate">
+            <h3 className="text-slate-200 font-semibold text-base max-w-45 truncate">
               {authUser.fullName}
             </h3>
-
-            <p className="text-slate-400 text-xs">Online</p>
           </div>
         </div>
 

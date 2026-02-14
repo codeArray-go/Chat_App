@@ -1,10 +1,11 @@
 import { XIcon } from "lucide-react";
-import { UseChatStore } from "../store/UseChatStore";
+import { UseChatStore } from "../../store/UseChatStore";
 import { useEffect, useRef } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router";
 
 function ChatHeader() {
-  const { selectedUser, setSelectedUser, typingUsers } = UseChatStore();
+  const { selectedUser, setSelectedUser, typingUsers, setIsSelectedUserFromList } = UseChatStore();
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(selectedUser._id);
   const closeRef = useRef(null);
@@ -17,10 +18,11 @@ function ChatHeader() {
     return () => window.removeEventListener("keydown", handleEscKey);
   }, [setSelectedUser]);
 
+  const navigateTo = useNavigate();
+
   return (
     <div
-      className="flex justify-between items-center bg-[#06070ae7] border-b
-   border-[#2f2f30d0] max-h-21 px-6 flex-1"
+      className="flex justify-between items-center bg-[#06070ae7] max-h-21 px-6 flex-1 cursor-pointer"
     >
       <div className="flex items-center space-x-3">
         <div
@@ -35,7 +37,9 @@ function ChatHeader() {
         </div>
 
         <div>
-          <h3 className="text-slate-200 font-medium">
+          <h3 className="text-slate-200 font-medium"
+            onClick={() => navigateTo("/Dashboard")}
+          >
             {selectedUser.fullName}
           </h3>
           <p className="text-slate-400 text-sm">
@@ -48,7 +52,10 @@ function ChatHeader() {
 
       <button
         className="hover:bg-[rgba(255,255,255,0.08)] rounded-full p-2.5"
-        onClick={() => setSelectedUser(null)}
+        onClick={() => {
+          setSelectedUser(null)
+          setIsSelectedUserFromList(false)
+        }}
       >
         <XIcon
           ref={closeRef}

@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
-import { SidebarOpen } from "lucide-react";
 
 export const UseChatStore = create((set, get) => ({
   allContact: [],
@@ -14,12 +13,17 @@ export const UseChatStore = create((set, get) => ({
   isMessageLoading: false,
   typingUsers: {},
   notifications: {},
+  searchBarOpen: false,
+  notificationCenterOpen: false,
   searchedUser: [],
-  sideBarOpen: false,
+  isSelectedUserFromList: false,
 
-  setSideBarOpen: (boolVal) => set({ sideBarOpen: boolVal }),
+  setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
+  setNotificationCenteOpen: (val) => set({ notificationCenterOpen: val }),
+  clearSearchedUser: () => set({ searchedUser: [] }),
+  setIsSelectedUserFromList: (bool) => set({ isSelectedUserFromList: bool }),
 
   getAllContacts: async () => {
     set({ isUserLoading: true });
@@ -36,13 +40,10 @@ export const UseChatStore = create((set, get) => ({
   searchInContacts: async (data) => {
     try {
       const res = await axiosInstance.get("/messages/search", { params: data });
-      set({ searchedUser: res.data })
-
+      set({ searchedUser: res.data });
     } catch (error) {
       toast.error("error in Searching");
       console.log(error);
-    } finally {
-      set({ searchUser: "" })
     }
   },
 

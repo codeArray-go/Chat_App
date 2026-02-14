@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import NoChatsFound from "./NoChatsFound";
-import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
-import { UseChatStore } from "../store/UseChatStore";
-import { useAuthStore } from "../store/useAuthStore";
+import NoChatsFound from "../chatSection/NoChatsFound";
+import UsersLoadingSkeleton from "../UserListSection/UsersLoadingSkeleton";
+import { UseChatStore } from "../../store/UseChatStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const ChatsList = () => {
   const {
@@ -13,7 +13,7 @@ const ChatsList = () => {
     selectedUser,
     typingUsers,
     notifications,
-    messages
+    setIsSelectedUserFromList
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
 
@@ -27,15 +27,19 @@ const ChatsList = () => {
 
   return (
     <>
+      <h1 className="font-bold mb-2 mx-3 text-base">Chat List</h1>
       {chats.map((chat) => (
         <div
           key={chat._id}
-          className={`tap-effect flex items-center justify-between gap-3 p-3 cursor-pointer transition-all 
+          className={`tap-effect rounded-lg flex items-center justify-between gap-3 p-2.5 cursor-pointer transition-all 
             ${selectedUser?._id === chat._id
               ? "bg-[#18181b]" : "bg-transparent hover:bg-[#0d1117]"
             }
           `}
-          onClick={() => setSelectedUser(chat)}
+          onClick={() => {
+            setSelectedUser(chat)
+            setIsSelectedUserFromList(true)
+          }}
         >
           {" "}
           <div className="flex items-center gap-3">
@@ -51,7 +55,7 @@ const ChatsList = () => {
               </div>
             </div>
             <div>
-              <h4 className="text-slate-200 text-base font-medium truncate">
+              <h4 className="text-slate-200 text-[15px] font-medium truncate">
                 {chat.fullName}
               </h4>
               {

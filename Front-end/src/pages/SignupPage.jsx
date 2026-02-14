@@ -15,6 +15,7 @@ function SignUpPage() {
     email: "",
     password: "",
   });
+
   const { signup, isSigningUp } = useAuthStore();
 
   const handleSubmit = (e) => {
@@ -23,120 +24,116 @@ function SignUpPage() {
   };
 
   return (
-    <div className="w-full flex items-center justify-center p-2 bg-slate-900">
-      <div className="relative w-full max-w-6xl md:h-200 h-162.5">
-        <div className="w-full flex flex-col md:flex-row">
-          {/* FORM CLOUMN - LEFT SIDE */}
-          <div className="md:w-1/2 flex items-center justify-center md:border-r border-slate-600/30">
-            <div className="w-full max-w-md">
-              {/* HEADING TEXT */}
-              <div className="text-center mb-8">
-                <MessageCircleIcon className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-                <h2 className="text-2xl font-bold text-slate-200 mb-2">
-                  Create Account
-                </h2>
-                <p className="text-slate-400">Sign up for a new account</p>
-              </div>
+    <div className="min-h-screen bg-[#06070a] flex">
 
-              {/* FORM */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* FULL NAME */}
-                <div>
-                  <label className="auth-input-label">Full Name</label>
-                  <div className="relative">
-                    <UserIcon className="auth-input-icon" />
+      {/* LEFT — Slim illustration panel (different from login) */}
+      <div className="hidden lg:flex w-[38%] border-r border-neutral-900 relative overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1200"
+          alt="Workspace"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
 
-                    <input
-                      type="text"
-                      value={formData.fullName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, fullName: e.target.value })
-                      }
-                      className="input"
-                      placeholder="Billu Bhasanda"
-                    />
-                  </div>
-                </div>
+        <div className="relative z-10 flex flex-col justify-center px-10">
+          <h2 className="text-2xl font-semibold text-neutral-100 leading-tight">
+            Build meaningful
+            <br /> conversations.
+          </h2>
 
-                {/* EMAIL INPUT */}
-                <div>
-                  <label className="auth-input-label">Email</label>
-                  <div className="relative">
-                    <MailIcon className="auth-input-icon" />
+          <p className="text-neutral-400 text-sm mt-4 max-w-xs">
+            Create your account and start chatting in a calm,
+            distraction-free environment designed for clarity.
+          </p>
+        </div>
+      </div>
 
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="input"
-                      placeholder="billubhasanda00@gmail.com"
-                    />
-                  </div>
-                </div>
+      {/* RIGHT — Centered signup card */}
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md bg-neutral-900/70 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.65)] p-8">
 
-                {/* PASSWORD INPUT */}
-                <div>
-                  <label className="auth-input-label">Password</label>
-                  <div className="relative">
-                    <LockIcon className="auth-input-icon" />
-
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      className="input"
-                      placeholder="Enter your password"
-                    />
-                  </div>
-                </div>
-
-                {/* SUBMIT BUTTON */}
-                <button
-                  className="auth-btn"
-                  type="submit"
-                  disabled={isSigningUp}
-                >
-                  {isSigningUp ? (
-                    <LoaderIcon className="w-full h-5 animate-spin text-center" />
-                  ) : (
-                    "Create Account"
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <Link to="/login" className="auth-link">
-                  Already have an account? Login
-                </Link>
-              </div>
+          {/* Logo */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="w-12 h-12 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center mb-4">
+              <MessageCircleIcon className="w-6 h-6 text-neutral-300" />
             </div>
+
+            <h1 className="text-xl font-semibold text-neutral-100">
+              Create your account
+            </h1>
+            <p className="text-neutral-500 text-sm mt-1">
+              It only takes a few seconds
+            </p>
           </div>
 
-          {/* FORM ILLUSTRATION - RIGHT SIDE */}
-          <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-linear-to-bl from-slate-800/20 to-transparent">
-            <div>
-              <img
-                src="/signup.png"
-                alt="People using mobile devices"
-                className="w-full h-auto object-contain"
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* FULL NAME */}
+            <div className="relative">
+              <UserIcon className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
+                placeholder="Full name"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600"
               />
-              <div className="mt-6 text-center">
-                <h3 className="text-xl font-medium text-cyan-400">
-                  Start Your Journey Today
-                </h3>
-
-                <div className="mt-4 flex justify-center gap-4">
-                  <span className="auth-badge">Free</span>
-                  <span className="auth-badge">Easy Setup</span>
-                  <span className="auth-badge">Private</span>
-                </div>
-              </div>
             </div>
-          </div>
+
+            {/* EMAIL */}
+            <div className="relative">
+              <MailIcon className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="Email address"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              />
+            </div>
+
+            {/* PASSWORD */}
+            <div className="relative">
+              <LockIcon className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="Password"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              />
+            </div>
+
+            {/* BUTTON */}
+            <button
+              type="submit"
+              disabled={isSigningUp}
+              className="w-full py-2.5 rounded-lg bg-neutral-200 text-neutral-900 font-medium hover:bg-neutral-300 active:scale-[0.98] transition flex items-center justify-center disabled:opacity-60"
+            >
+              {isSigningUp ? (
+                <LoaderIcon className="w-4 h-4 animate-spin" />
+              ) : (
+                "Create account"
+              )}
+            </button>
+          </form>
+
+          {/* FOOTER */}
+          <p className="text-center text-xs text-neutral-500 mt-6">
+            Already have an account?{" "}
+            <Link to="/login" className="text-neutral-200 hover:underline">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>

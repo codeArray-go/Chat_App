@@ -13,6 +13,7 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+
   const { login, isLogginIn } = useAuthStore();
 
   const handleSubmit = (e) => {
@@ -21,101 +22,122 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-slate-900">
-      <div className="relative w-full max-w-6xl h-full">
-        <div className="w-full flex flex-col md:flex-row p-4">
-          {/* FORM CLOUMN - LEFT SIDE */}
-          <div className="md:w-1/2 flex items-center justify-center md:border-r border-slate-600/30">
-            <div className="w-full max-w-md">
-              {/* HEADING TEXT */}
-              <div className="text-center mb-8">
-                <MessageCircleIcon className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-                <h2 className="text-2xl font-bold text-slate-200 mb-2">
-                  Welcome Back
-                </h2>
-                <p className="text-slate-400">Login to access your account.</p>
-              </div>
+    <div className="min-h-screen bg-[#06070a] relative overflow-hidden flex items-center justify-center px-4">
 
-              {/* FORM */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* EMAIL INPUT */}
-                <div>
-                  <label className="auth-input-label">Email</label>
-                  <div className="relative">
-                    <MailIcon className="auth-input-icon" />
+      {/* subtle radial glow */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-neutral-700 blur-[140px] rounded-full" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-neutral-800 blur-[140px] rounded-full" />
+      </div>
 
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="input"
-                      placeholder="email123@gmail.com"
-                    />
-                  </div>
-                </div>
+      {/* main container */}
+      <div className="relative w-full max-w-6xl grid lg:grid-cols-2 gap-10 items-center">
 
-                {/* PASSWORD INPUT */}
-                <div>
-                  <label className="auth-input-label">Password</label>
-                  <div className="relative">
-                    <LockIcon className="auth-input-icon" />
+        {/* LEFT — Illustration side (top on mobile) */}
+        <div className="hidden lg:flex flex-col items-center justify-center text-center space-y-6">
 
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      className="input"
-                      placeholder="Enter your password"
-                    />
-                  </div>
-                </div>
+          <img
+            src="https://illustrations.popsy.co/gray/work-from-home.svg"
+            alt="Chat illustration"
+            className="w-[420px] max-w-full opacity-90"
+          />
 
-                {/* SUBMIT BUTTON */}
-                <button
-                  className="auth-btn"
-                  type="submit"
-                  disabled={isLogginIn}
-                >
-                  {isLogginIn ? (
-                    <LoaderIcon className="w-full h-5 animate-spin text-center" />
-                  ) : (
-                    "Sign In"
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <Link to="/signup" className="auth-link">
-                  Don't have account? Sign Up
-                </Link>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold text-neutral-200">
+              Conversations, simplified
+            </h2>
+            <p className="text-neutral-500 text-sm max-w-sm mx-auto">
+              A distraction-free messaging experience designed with clarity,
+              privacy, and speed in mind.
+            </p>
           </div>
+        </div>
 
-          {/* FORM ILLUSTRATION - RIGHT SIDE */}
-          <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-linear-to-bl from-slate-800/20 to-transparent">
-            <div>
-              <img
-                src="/login.png"
-                alt="People using mobile devices"
-                className="w-full h-auto object-contain"
-              />
-              <div className="mt-6 text-center">
-                <h3 className="text-xl font-medium text-cyan-400">
-                  connect anytime, anywhere
-                </h3>
+        {/* RIGHT — Floating login card */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-md bg-neutral-900/70 backdrop-blur-2xl border border-neutral-800 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-8 sm:p-10">
 
-                <div className="mt-4 flex justify-center gap-4">
-                  <span className="auth-badge">Free</span>
-                  <span className="auth-badge">Easy Setup</span>
-                  <span className="auth-badge">Private</span>
+            {/* Logo */}
+            <div className="flex flex-col items-center text-center mb-8">
+              <div className="w-12 h-12 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center mb-4">
+                <MessageCircleIcon className="w-6 h-6 text-neutral-300" />
+              </div>
+
+              <h1 className="text-2xl font-semibold text-neutral-100">
+                Welcome back
+              </h1>
+              <p className="text-neutral-500 text-sm mt-1">
+                Sign in to continue your secure chats
+              </p>
+            </div>
+
+            {/* FORM */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+
+              {/* EMAIL */}
+              <div className="space-y-1">
+                <label className="text-xs text-neutral-400">Email</label>
+
+                <div className="relative">
+                  <MailIcon className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    placeholder="you@example.com"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 transition"
+                  />
                 </div>
               </div>
-            </div>
+
+              {/* PASSWORD */}
+              <div className="space-y-1">
+                <label className="text-xs text-neutral-400">Password</label>
+
+                <div className="relative">
+                  <LockIcon className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+
+                  <input
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="Enter your password"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 transition"
+                  />
+                </div>
+              </div>
+
+              {/* BUTTON */}
+              <button
+                type="submit"
+                disabled={isLogginIn}
+                className="w-full py-2.5 rounded-lg bg-neutral-200 text-neutral-900 font-medium hover:bg-neutral-300 active:scale-[0.98] transition flex items-center justify-center disabled:opacity-60"
+              >
+                {isLogginIn ? (
+                  <LoaderIcon className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+            </form>
+
+            {/* FOOTER */}
+            <p className="text-center text-xs text-neutral-500 mt-6">
+              Don’t have an account?{" "}
+              <Link
+                to="/signup"
+                className="text-neutral-200 hover:underline"
+              >
+                Create one
+              </Link>
+            </p>
           </div>
         </div>
       </div>
