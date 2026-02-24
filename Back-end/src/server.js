@@ -23,6 +23,10 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoute);
 
+app.get("/api/ping", (req, res) => {
+  res.status(200).json({ message: "Server alive 🚀" });
+});
+
 const PORT = ENV.PORT;
 
 /* ---------- For deployment of front end and backend at same place ---------- */
