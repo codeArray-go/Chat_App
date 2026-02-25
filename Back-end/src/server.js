@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
+import requestRoute from "./routes/request.route.js";
 import { connectDB } from "./lib/db.js";
 import { app, server } from "./lib/socket.js";
 // import path from "path";
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoute);
+app.use("/api/request", requestRoute);
 
 app.get("/api/ping", (req, res) => {
   res.status(200).json({ message: "Server alive 🚀" });

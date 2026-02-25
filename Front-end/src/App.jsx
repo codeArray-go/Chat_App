@@ -8,8 +8,7 @@ import PageLoader from "./components/PageLoader";
 import { Toaster } from "react-hot-toast";
 import { UseChatStore } from "./store/UseChatStore";
 import Dashboard from "./pages/Dashboard";
-import Home from "./pages/Home";
-import SideBar from "./components/sideBar/SideBar"
+import SideBar from "./components/sideBar/SideBar";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -23,6 +22,7 @@ const App = () => {
 
     UseChatStore.getState().getNotification();
     UseChatStore.getState().initTypingListener();
+    UseChatStore.getState().getAllFriendRequest();
   }, [authUser]);
 
   if (isCheckingAuth) return <PageLoader />;
@@ -37,10 +37,6 @@ const App = () => {
         <Route
           path="/Dashboard"
           element={authUser ? <Dashboard /> : <Navigate to={"/login"} />}
-        />
-        <Route
-          path="/Home"
-          element={authUser ? <Home /> : <Navigate to={"/Login"} />}
         />
         <Route
           path="/login"
