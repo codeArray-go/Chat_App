@@ -15,7 +15,8 @@ const SideBar = () => {
     setNotificationCenteOpen,
     notificationCenterOpen,
     setSelectedUser,
-    clearSearchedUser
+    clearSearchedUser,
+    friendRequests
   } = UseChatStore();
 
   const navigateTo = useNavigate('/Dashboard')
@@ -105,27 +106,32 @@ const SideBar = () => {
         <>
           <h1 className="font-bold text-base my-7">Notification Center</h1>
 
-          <div className="flex justify-between items-center p-3">
-            <div className="flex items-center gap-3">
-              <div
-                className="avatar"
-              >
-                <div className="size-10 rounded-full overflow-hidden">
-                  <img
-                    src="/avatar.png"
-                    alt="fullName"
-                    className="w-full h-full object-cover"
-                  />
+          {friendRequests.map((data, index) => {
+            return (
+              <div key={index} className="flex justify-between items-center p-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="avatar"
+                  >
+                    <div className="size-10 rounded-full overflow-hidden">
+                      <img
+                        src={data.profilePic || "/avatar.png"}
+                        alt={data.fullName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-slate-200 text-base font-medium truncate">
+                      {data.fullName}
+                    </h4>
+                  </div>
                 </div>
+                <button type="button" className="btn btn-primary rounded-lg">Accept</button>
               </div>
-              <div>
-                <h4 className="text-slate-200 text-base font-medium truncate">
-                  Name
-                </h4>
-              </div>
-            </div>
-            <button type="button" className="btn btn-primary py-1">follow</button>
-          </div>
+            )
+          })
+          }
         </>
       }
     </div >
