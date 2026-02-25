@@ -5,10 +5,9 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const MessageInput = () => {
-  const { selectedUser } = UseChatStore();
+  const { selectedUser, text, setText } = UseChatStore();
   const { socket } = useAuthStore();
 
-  const [text, setText] = useState("");
   const [imgPreview, setImgPreview] = useState(null);
   const fileInputRef = useRef(null);
   const { sendMessage } = UseChatStore();

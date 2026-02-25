@@ -1,10 +1,12 @@
+import { useNavigate } from 'react-router'
 import NavigationBar from '../components/sideBar/NavigationBar'
 import { useAuthStore } from '../store/useAuthStore'
 import { UseChatStore } from '../store/UseChatStore'
 
 const Dashboard = () => {
     const { authUser } = useAuthStore()
-    const { selectedUser } = UseChatStore()
+    const { selectedUser, setIsSelectedUserFromList, sendFriendRequest } = UseChatStore()
+    const navigateTo = useNavigate()
 
     return (
         <div className='flex justify-between w-screen h-screen'>
@@ -25,8 +27,25 @@ const Dashboard = () => {
                     </div>
 
                     <div className="button flex gap-5 justify-center mt-10">
-                        <button className='btn btn-wide py-6 rounded-xl'>{selectedUser ? "Follow" : "Edit Profile"}</button>
-                        <button className='btn btn-wide py-6 rounded-xl'>{selectedUser ? "Message" : "View"}</button>
+                        <button
+                            onClick={() => {
+                                if (selectedUser) {
+                                    sendFriendRequest();
+                                }
+                            }}
+                            className='btn btn-wide py-6 rounded-xl'>
+                            {
+                                selectedUser ?
+                                    "Follow"
+                                    : "Edit Profile"
+                            }
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsSelectedUserFromList(true)
+                                navigateTo('/')
+                            }}
+                            className='btn btn-wide py-6 rounded-xl'>{selectedUser ? "Message" : "View"}</button>
                     </div>
                 </div>
             </div>

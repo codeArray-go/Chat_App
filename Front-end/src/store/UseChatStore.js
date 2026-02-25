@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 
 export const UseChatStore = create((set, get) => ({
+  text: "",
   allContact: [],
   chats: [],
   messages: [],
@@ -17,13 +18,45 @@ export const UseChatStore = create((set, get) => ({
   notificationCenterOpen: false,
   searchedUser: [],
   isSelectedUserFromList: false,
+  isSendingRequest: false,
+  friendRequests: [],
 
+  setText: (text) => set({ text: text }),
   setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser: selectedUser }),
   setNotificationCenteOpen: (val) => set({ notificationCenterOpen: val }),
   clearSearchedUser: () => set({ searchedUser: [] }),
   setIsSelectedUserFromList: (bool) => set({ isSelectedUserFromList: bool }),
+
+  getAllFriendRequest: async () => {
+    try {
+      const res = await axiosInstance.get("/request/getFriendRequest")
+      const requests = res.data
+      set({ friendRequests: requests })
+    } catch (error) {
+      toast.error("Error in fetching all request")
+      console.log(error);
+    }
+  },
+
+  sendFriendRequest: async () => {
+    set({ isSendingRequest: true })
+
+    const { selectedUser } = get();
+    try {
+      await axiosInstance.post("/request/sended", {
+        receiverId: selectedUser._id
+      });
+
+      toast.success("Successfully sended your fiend Request")
+    } catch (error) {
+      toast.error("error Sending friend Request.")
+      console.log(error)
+    } finally {
+      set({ isSendingRequest: false })
+    }
+  },
 
   getAllContacts: async () => {
     set({ isUserLoading: true });
