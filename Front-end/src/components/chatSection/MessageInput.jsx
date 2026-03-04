@@ -18,21 +18,21 @@ const MessageInput = () => {
 
     // If user clears input completely, stop typing immediately
     if (e.target.value.trim() === "") {
-      socket.emit("stopTyping", selectedUser._id);
+      socket.emit("stopTyping", selectedUser.id);
       return;
     }
   };
 
   // Immediate stop if they click outside
   const handleBlur = () => {
-    socket.emit("stopTyping", selectedUser._id);
+    socket.emit("stopTyping", selectedUser.id);
   };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imgPreview) return;
 
-    socket.emit("stopTyping", selectedUser._id);
+    socket.emit("stopTyping", selectedUser.id);
 
     try {
       // Cleanup
@@ -70,7 +70,7 @@ const MessageInput = () => {
   };
 
   const handleKeyDown = () => {
-    socket.emit("typing", selectedUser._id);
+    socket.emit("typing", selectedUser.id);
   };
 
   return (

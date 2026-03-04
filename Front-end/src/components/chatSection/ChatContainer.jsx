@@ -1,59 +1,80 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import { UseChatStore } from "../../store/UseChatStore";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaeholder";
 import { useAuthStore } from "../../store/useAuthStore";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 import MessageInput from "./MessageInput";
+import { MoreVerticalIcon, Reply } from "lucide-react";
 
 const ChatContainer = () => {
   const {
     selectedUser,
     messages,
-    getMessageByUserId,
     isMessageLoading,
     subscribeToMessages,
     unsubscribeToMessages,
     isTyping,
     typingUsers,
+    deleteMessage,
   } = UseChatStore();
+
+  const [hoveredToMessage, setHoveredToMessage] = useState(null);
+  const [messageSelected, setMessageSelected] = useState(null);
 
   const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (!selectedUser?._id || messages.length === 0) return;
+    if (!selectedUser?.id || messages.length === 0) return;
 
     const lastMsg = messages[messages.length - 1];
 
-    if (lastMsg.senderId === selectedUser._id && !lastMsg.isSeen) {
+    if (lastMsg.sender_id === selectedUser.id && !lastMsg.is_seen) {
       socket.emit("markMessagesAsSeen", {
-        messageSenderId: selectedUser._id,
-        myId: authUser._id,
-        lastSeenMessageId: lastMsg._id,
+        messagesender_id: selectedUser.id,
+        myId: authUser.id,
+        lastSeenMessageId: lastMsg.id,
       });
     }
   }, [messages, selectedUser, socket, authUser]);
 
   useEffect(() => {
-    if (!selectedUser?._id) return;
-    getMessageByUserId(selectedUser._id);
     subscribeToMessages();
 
     // cleanUp
     return () => unsubscribeToMessages();
-  }, [
-    selectedUser,
-    getMessageByUserId,
-    subscribeToMessages,
-    unsubscribeToMessages,
-  ]);
+  }, [subscribeToMessages, unsubscribeToMessages]);
 
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
+
+  // CHECKING CLICK OUTSIDE SELECTED BODIES
+
+  const SelectionDot = useRef(null);
+  const SelectedList = useRef(null);
+
+  const handleClickOutSide = (event) => {
+    const path = event.composedPath();
+
+    if (
+      !path.includes(SelectionDot.current) &&
+      !path.includes(SelectedList.current)
+    ) {
+      setMessageSelected(null);
+      setHoveredToMessage(null);
+    }
+  };
+
+  useEffect(() => {
+    document.body.addEventListener("click", handleClickOutSide);
+    return () => {
+      document.body.removeEventListener("click", handleClickOutSide);
+    };
+  }, []);
 
   const msgSentTime = (msg) => {
     return new Date(msg).toLocaleTimeString([], {
@@ -63,9 +84,8 @@ const ChatContainer = () => {
   };
 
   const lastSentMessageId = useMemo(() => {
-    return [...messages].reverse().find((m) => m.senderId === authUser._id)
-      ?._id;
-  }, [messages, authUser._id]);
+    return [...messages].reverse().find((m) => m.sender_id === authUser.id)?.id;
+  }, [messages, authUser.id]);
 
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">
@@ -75,22 +95,76 @@ const ChatContainer = () => {
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
             {messages.map((msg) => (
-              <div key={msg._id}>
+              <div
+                key={msg.id}
+                className="relative"
+                onMouseEnter={() =>
+                  !messageSelected && setHoveredToMessage(msg.id)
+                }
+                onMouseLeave={() =>
+                  !messageSelected && setHoveredToMessage(null)
+                }
+              >
                 <div
-                  className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"
-                    }`}
+                  className={`chat ${
+                    msg.sender_id === authUser.id ? "chat-end" : "chat-start"
+                  }`}
                 >
                   <div
                     className={`chat-bubble relative rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 max-w-[85%] sm:max-w-[70%] wrap-break-word transition-all duration-300 ease-out
-                ${msg.senderId === authUser._id
-                        ? `bg-blue-900 text-white rounded-br-none ${msg.isOptimistic
+                ${
+                  msg.sender_id === authUser.id
+                    ? `bg-blue-900 text-white rounded-br-none ${
+                        msg.isOptimistic
                           ? "-translate-x-3 opacity-80"
                           : "translate-x-0"
-                        }`
-                        : "bg-[#2f2f30d0] text-slate-200 rounded-bl-none"
-                      }
+                      }`
+                    : "bg-[#2f2f30d0] text-slate-200 rounded-bl-none"
+                }
               `}
                   >
+                    {/* THREE DOTS ON HOVER */}
+                    {hoveredToMessage === msg.id && (
+                      <div
+                        className={`absolute top-1/2 -translate-y-1/2 ${msg.sender_id === authUser.id ? "-left-8" : "-right-8"} cursor-pointer hover:bg-white/10 rounded-full p-1.5 transition`}
+                        onClick={() => {
+                          setMessageSelected(msg.id);
+                          setHoveredToMessage(msg.id);
+                        }}
+                        ref={SelectionDot}
+                      >
+                        <MoreVerticalIcon size={18} />
+                      </div>
+                    )}
+
+                    {/* LIST TO PERFORM EXTRA TASK */}
+                    {messageSelected === msg.id && (
+                      <div
+                        ref={SelectedList}
+                        className={`absolute top-8 ${msg.sender_id === authUser.id ? "right-28" : "left-28"} bg-zinc-900 border border-white/10 rounded-xl shadow-xl min-w-40 overflow-hidden`}
+                      >
+                        {/* Reply */}
+                        <button className="flex items-center gap-3 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition">
+                          <Reply size={18} />
+                          <span>Reply</span>
+                        </button>
+
+                        {/* Delete */}
+                        {msg.sender_id === authUser.id && (
+                          <button
+                            onClick={() => {
+                              deleteMessage(msg.id, selectedUser.id);
+                              setMessageSelected(null);
+                            }}
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition"
+                          >
+                            <img className="h-4 w-4" src="/close.svg" />
+                            <span>Delete message</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* Image */}
                     {msg.image && (
                       <img
@@ -107,7 +181,7 @@ const ChatContainer = () => {
                     )}
 
                     <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
-                      {new Date(msg.createdAt).toLocaleTimeString([], {
+                      {new Date(msg.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -116,18 +190,38 @@ const ChatContainer = () => {
                 </div>
 
                 {/* Seen or Sent Status  */}
-                {msg._id === lastSentMessageId && (
+                {msg.id === lastSentMessageId && (
                   <p className="text-gray-500 text-sm text-right">
-                    {msg.isSeen
+                    {msg.is_seen
                       ? "Seen"
-                      : `Sent at ${msgSentTime(msg.createdAt)}`}
+                      : `Sent at ${msgSentTime(msg.created_at)}`}
                   </p>
                 )}
+
+                {/* {messageSelected === msg.id && (
+                  <div
+                    className={`absolute top-full mt-1 z-50 
+    ${msg.sender_id === authUser.id ? "left-0" : "right-0"}
+    bg-black/80 rounded-xl p-1`}
+                    ref={SelectedList}
+                  >
+                    <button
+                      onClick={() => {
+                        deleteMessage(msg.id, selectedUser.id);
+                        setMessageSelected(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 hover:bg-red-500/10 text-red-400 rounded-lg"
+                    >
+                      <img className="h-4" src="/close.svg" />
+                      Delete
+                    </button>
+                  </div>
+                )} */}
               </div>
             ))}
 
             {/* 2. TYPING INDICATOR  */}
-            {typingUsers[selectedUser?._id] && (
+            {typingUsers[selectedUser?.id] && (
               <div className="chat chat-start">
                 <div className="chat-bubble bg-gray-800 text-xs italic opacity-50 flex items-center gap-1 rounded-2xl rounded-bl-none px-5 py-3">
                   <span className="loading loading-dots loading-xs"></span>
@@ -141,7 +235,7 @@ const ChatContainer = () => {
         ) : isMessageLoading ? (
           <MessagesLoadingSkeleton />
         ) : (
-          <NoChatHistoryPlaceholder name={selectedUser.fullName} />
+          <NoChatHistoryPlaceholder name={selectedUser.full_name} />
         )}
       </div>
 

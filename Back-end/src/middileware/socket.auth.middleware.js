@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+// import User from "../models/Table.js";
 import { ENV } from "../lib/env.js";
+import { pool } from "../lib/db.js";
 
 export const socketAuthMiddleware = async (socket, next) => {
   try {
@@ -23,7 +24,13 @@ export const socketAuthMiddleware = async (socket, next) => {
     }
 
     // find the user fromdb
-    const user = await User.findById(decoded.userId).select("-password");
+    const user = (
+      await pool.query(
+        `SELECT id, email, full_name, profile_pic FROM users WHERE id=$1`,
+        [decoded.userId],
+      )
+    ).rows[0];
+
     if (!user) {
       console.log("Socket connection rejected: User not found");
       return next(new Error("User not found"));
@@ -31,10 +38,10 @@ export const socketAuthMiddleware = async (socket, next) => {
 
     // attach user info to socket
     socket.user = user;
-    socket.userId = user._id.toString();
+    socket.userId = user.id;
 
     console.log(
-      `Socket authenticated for user: ${user.fullName} (${user._id})`,
+      `Socket authenticated for user: ${user.full_name} (${user.id})`,
     );
 
     next();

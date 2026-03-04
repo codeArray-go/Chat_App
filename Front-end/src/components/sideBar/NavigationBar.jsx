@@ -63,7 +63,7 @@ const NavigationBar = () => {
             className="rounded-full overflow-hidden h-8 w-8 sm:h-9 sm:w-9 border-2 border-[#6b6b6b] cursor-pointer shrink-0"
           >
             <img
-              src={authUser.profilePic || "./avatar.png"}
+              src={authUser.profile_pic || "./avatar.png"}
               alt="Profile"
               className="h-full w-full object-cover"
             />
