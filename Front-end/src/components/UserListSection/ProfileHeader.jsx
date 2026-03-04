@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { LogOutIcon, EllipsisVertical, XIcon } from "lucide-react";
-import { useAuthStore } from "../../store/useAuthStore"
+import { useAuthStore } from "../../store/useAuthStore";
 
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore();
@@ -33,7 +33,7 @@ function ProfileHeader() {
         const base64Image = reader.result;
         setSelectedImg(base64Image);
 
-        await updateProfile({ profilePic: base64Image });
+        await updateProfile({ profile_pic: base64Image });
       } catch (error) {
         toast.error("Failed to upload image");
       }
@@ -51,13 +51,13 @@ function ProfileHeader() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* AVATAR */}
-          <div className="avatar border-2 border-gray-200/50 rounded-full">
+          <div className="avatar border-2 border-cyan-700 rounded-full">
             <button
               className="size-14 rounded-full overflow-hidden relative group cursor-pointer"
               onClick={() => fileInputRef.current.click()}
             >
               <img
-                src={selectedImg || authUser.profilePic || "/avatar.png"}
+                src={selectedImg || authUser.profile_pic || "/avatar.png"}
                 alt="User image"
                 className="size-full object-cover"
               />
@@ -78,7 +78,7 @@ function ProfileHeader() {
           {/* USERNAME */}
           <div>
             <h3 className="text-slate-200 font-semibold text-base max-w-45 truncate">
-              {authUser.fullName}
+              {authUser.full_name}
             </h3>
           </div>
         </div>
@@ -86,15 +86,17 @@ function ProfileHeader() {
         {/* BUTTONS */}
         <div className="flex gap-4 items-center relative">
           {/* LOGOUT BTN */}
-          <div onClick={() => { setOpenMenu((prev) => !prev) }} className=" p-2 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer">
+          <div
+            onClick={() => {
+              setOpenMenu((prev) => !prev);
+            }}
+            className=" p-2 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+          >
             {!openMenu ? <EllipsisVertical size={20} /> : <XIcon size={20} />}
           </div>
 
-          {openMenu &&
-
-            <div
-              className="absolute z-10 top-12 right-2 sm:right-0 min-w-44 bg-[#101013] border border-[#444444] rounded-xl shadow-2xl shadow-black/60 p-1.5 text-slate-300 ring-1 ring-white/5 backdrop-blur-sm"
-            >
+          {openMenu && (
+            <div className="absolute z-10 top-12 right-2 sm:right-0 min-w-44 bg-[#101013] border border-[#444444] rounded-xl shadow-2xl shadow-black/60 p-1.5 text-slate-300 ring-1 ring-white/5 backdrop-blur-sm">
               <button
                 onClick={logout}
                 className="group flex items-center justify-between gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-[#2b2b2b] hover:text-white transition-all duration-200 text-sm font-medium"
@@ -110,9 +112,7 @@ function ProfileHeader() {
                 Theme
               </button>
             </div>
-
-          }
-
+          )}
         </div>
       </div>
     </div>

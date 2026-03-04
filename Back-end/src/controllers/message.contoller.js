@@ -1,14 +1,24 @@
-import Message from "../models/Message.js";
-import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js";
+import { pool } from "../lib/db.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getAllContacts = async (req, res) => {
   try {
-    const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    const loggedInUserId = req.user.id;
+    const filtere = await pool.query(
+      `SELECT 
+        u.id, 
+        u.full_name, 
+        u.email, 
+        u.profile_pic 
+      FROM users u
+      LEFT JOIN messages m ON u.id = m.sender_id
+      WHERE u.id !=$1
+      ORDER BY m.created_at DESC;`,
+      [loggedInUserId],
+    );
+
+    const filteredUsers = filtere.rows;
 
     res.status(200).json(filteredUsers);
   } catch (error) {
@@ -19,16 +29,20 @@ export const getAllContacts = async (req, res) => {
 
 export const getMessagesByUserId = async (req, res) => {
   try {
-    const myId = req.user._id;
+    const myId = req.user.id;
 
     const { id: userToChatId } = req.params;
 
-    const message = await Message.find({
-      $or: [
-        { senderId: myId, receiverId: userToChatId },
-        { senderId: userToChatId, receiverId: myId },
-      ],
-    });
+    const message = (
+      await pool.query(
+        `
+          SELECT * FROM messages 
+          WHERE 
+          (sender_id=$1 AND receiver_id=$2) OR (sender_id=$2 AND receiver_id=$1)
+        `,
+        [myId, userToChatId],
+      )
+    ).rows;
 
     res.status(200).json(message);
   } catch (error) {
@@ -40,32 +54,40 @@ export const getMessagesByUserId = async (req, res) => {
 export const searchUser = async (req, res) => {
   try {
     const { query } = req.query;
+    console.log(query);
 
     if (!query) return;
 
-    const searchQuery = await User.find({ fullName: { $regex: query } })
+    const searchQuery = (
+      await pool.query(
+        `SELECT id, email, full_name, profile_pic FROM users WHERE full_name ILIKE '%' || $1 || '%'`,
+        [query],
+      )
+    ).rows;
 
     res.status(200).json(searchQuery);
   } catch (error) {
-    console.log("Error in searching", error)
+    console.log("Error in searching", error);
   }
-}
+};
 
 export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
-    const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const { id: receiver_id } = req.params;
+    const sender_id = req.user.id;
 
     if (!text && !image) {
       return res.status(400).json({ message: "Text or image is required." });
     }
-    if (senderId.equals(receiverId)) {
+    if (sender_id === receiver_id) {
       return res
         .status(400)
         .json({ message: "Cannot send messages to yourself." });
     }
-    const receiverExists = await User.exists({ _id: receiverId });
+    const receiverExists = await pool.query(`SELECT 1 FROM users WHERE id=$1`, [
+      receiver_id,
+    ]);
     if (!receiverExists) {
       return res.status(404).json({ message: "Receiver not found." });
     }
@@ -76,29 +98,26 @@ export const sendMessage = async (req, res) => {
       imageUrl = uploadToCloudinary.secure_url;
     }
 
-    const newMessage = new Message({
-      senderId,
-      receiverId,
-      text,
-      image: imageUrl,
-      isSeen: false,
-    });
+    const newMessage = (
+      await pool.query(
+        `INSERT INTO messages(sender_id, receiver_id, text, image) VALUES($1, $2, $3, $4) RETURNING *`,
+        [sender_id, receiver_id, text, imageUrl],
+      )
+    ).rows[0];
 
-    await newMessage.save();
+    const countUnreadCount = await pool.query(
+      `SELECT COUNT(*) FROM messages WHERE (is_seen=false AND sender_id=$1 AND receiver_id=$2)`,
+      [sender_id, receiver_id],
+    );
 
-    // SENDING MESAAGES IN REAL-TIME IF USER IF ONLINE- SOCKET.IO
-    const unreadCount = await Message.countDocuments({
-      senderId: senderId,
-      receiverId: receiverId,
-      isSeen: false,
-    });
+    const unreadCount = Number(countUnreadCount.rows[0].count);
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
+    const receiverSocketId = getReceiverSocketId(receiver_id);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
       io.to(receiverSocketId).emit("unreadCount", {
-        sender: senderId,
+        sender: sender_id,
         count: unreadCount,
       });
     }
@@ -113,24 +132,20 @@ export const sendMessage = async (req, res) => {
 // GET NOTIFICATION FROM DATABASE
 export const getNotification = async (req, res) => {
   try {
-    const myId = req.user._id;
+    const myId = req.user.id;
 
     if (!myId) return;
 
-    const unreadMessages = await Message.aggregate([
-      {
-        $match: {
-          receiverId: myId,
-          isSeen: false,
-        },
-      },
-      {
-        $group: {
-          _id: "$senderId",
-          count: { $sum: 1 }, // count per sender
-        },
-      },
-    ]);
+    const unreadMessages = (
+      await pool.query(
+        `
+      SELECT sender_id, COUNT(*) AS unread_count FROM messages
+      WHERE receiver_id=$1 AND is_seen=false
+      GROUP BY sender_id
+      `,
+        [myId],
+      )
+    ).rows;
 
     res.status(201).json(unreadMessages);
   } catch (error) {
@@ -140,30 +155,59 @@ export const getNotification = async (req, res) => {
 
 export const getChatParameter = async (req, res) => {
   try {
-    const loggedInUserId = req.user._id;
+    const loggedInUserId = req.user.id;
 
     // FIND ALL THE MESSAGE WHERE THE LOGGED-IN USER IS EITHER A RECIEVER OR A SENDER.
-    const messages = await Message.find({
-      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
-    });
+    const chatPartenersId = (
+      await pool.query(
+        `SELECT DISTINCT CASE WHEN sender_id = $1 THEN receiver_id
+        ELSE sender_id END AS partner_id
+        FROM messages WHERE sender_id = $1 OR receiver_id = $1;`,
+        [loggedInUserId],
+      )
+    ).rows.map((row) => row.partner_id);
 
-    const chatPartenersId = [
-      ...new Set(
-        messages.map((msg) =>
-          msg.senderId.toString() === loggedInUserId.toString()
-            ? msg.receiverId.toString()
-            : msg.senderId.toString(),
-        ),
-      ),
-    ];
+    console.log(chatPartenersId.length);
 
-    const chatParteners = await User.find({
-      _id: { $in: chatPartenersId },
-    }).select("-password");
+    if (chatPartenersId.length === 0) return res.json([]);
+
+    const chatParteners = (
+      await pool.query(
+        `SELECT id, full_name, email, profile_pic FROM users WHERE id=ANY($1)`,
+        [chatPartenersId],
+      )
+    ).rows;
 
     res.status(200).json(chatParteners);
   } catch (error) {
     console.log("Error in getChatparameter: ", error.message);
     res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export const deleteMessage = async (req, res) => {
+  const { message_id } = req.body;
+
+  const myId = req.user.id;
+
+  try {
+    if (!message_id) return;
+
+    const Delete = (
+      await pool.query(
+        `DELETE FROM messages WHERE id=$1 AND sender_id=$2 RETURNING receiver_id`,
+        [message_id, myId],
+      )
+    ).rows[0];
+
+    const receiverSocketId = getReceiverSocketId(Delete.receiver_id);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("DeletedMsgId", message_id);
+    }
+
+    res.status(200).json({ message: "Message deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error." });
+    console.log(error);
   }
 };

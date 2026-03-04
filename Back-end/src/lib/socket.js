@@ -3,7 +3,7 @@ import http from "http";
 import express from "express";
 import { ENV } from "./env.js";
 import { socketAuthMiddleware } from "../middileware/socket.auth.middleware.js";
-import Message from "../models/Message.js";
+import { pool } from "./db.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -26,7 +26,7 @@ export function getReceiverSocketId(userId) {
 }
 
 io.on("connection", (socket) => {
-  console.log("A user connected.", socket.user.fullName);
+  console.log("A user connected.", socket.user.full_name);
 
   const userId = socket.userId;
   userSocketMap[userId] = socket.id;
@@ -34,8 +34,8 @@ io.on("connection", (socket) => {
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   // LISTEN TO TYPING MESSAGE FROM CLIENT
-  socket.on("typing", (receiverId) => {
-    const receiverSocketId = getReceiverSocketId(receiverId);
+  socket.on("typing", (receiver_id) => {
+    const receiverSocketId = getReceiverSocketId(receiver_id);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("typing", userId);
@@ -43,40 +43,51 @@ io.on("connection", (socket) => {
   });
 
   // MESSAGE SEEN OR NOT
-  socket.on("markMessagesAsSeen", async ({ messageSenderId, myId }) => {
-    const alreadySeen = await Message.exists({
-      senderId: messageSenderId,
-      receiverId: myId,
-      isSeen: false,
-    });
+  socket.on("markMessagesAsSeen", async ({ messagesender_id, myId }) => {
+    const alreadySeen = (
+      await pool.query(
+        `SELECT * FROM messages WHERE sender_id=$1 AND receiver_id=$2 AND is_seen=false`,
+        [messagesender_id, myId],
+      )
+    ).rows;
 
-    if (!alreadySeen) return;
+    if (alreadySeen.length === 0) return;
+
     try {
-      await Message.updateMany(
-        {
-          senderId: messageSenderId,
-          receiverId: myId,
-          isSeen: false,
-        },
-        { $set: { isSeen: true } },
+      await pool.query(
+        `
+        UPDATE messages 
+        SET 
+          sender_id=$1, receiver_id=$2, is_seen=true 
+        WHERE 
+          sender_id=$1 AND receiver_id=$2 AND is_seen=false
+        `,
+        [messagesender_id, myId],
       );
-      const senderSocketId = getReceiverSocketId(messageSenderId);
+
+      const senderSocketId = getReceiverSocketId(messagesender_id);
 
       if (senderSocketId) {
         io.to(senderSocketId).emit("messagesSeenByPeer", myId);
       }
 
-      const unreadCount = await Message.countDocuments({
-        senderId: messageSenderId,
-        receiverId: myId,
-        isSeen: false,
-      });
+      const unreadCount = (
+        await pool.query(
+          `SELECT COUNT(*) FROM messages 
+                                            WHERE 
+                                              sender_id=$1 AND
+                                              receiver_id=$2 AND
+                                              is_seen=false
+                                            `,
+          [messagesender_id, myId],
+        )
+      ).rows[0].count;
 
       if (unreadCount > 0) return;
 
       const mySocketId = getReceiverSocketId(myId);
       io.to(mySocketId).emit("unreadCountUpdateAfterSeen", {
-        sender: messageSenderId,
+        sender: messagesender_id,
         count: unreadCount,
       });
     } catch (err) {
@@ -85,15 +96,16 @@ io.on("connection", (socket) => {
   });
 
   // STOP TYPING ANIMATION
-  socket.on("stopTyping", (receiverId) => {
-    const receiverSocketId = getReceiverSocketId(receiverId);
+  socket.on("stopTyping", (receiver_id) => {
+    const receiverSocketId = getReceiverSocketId(receiver_id);
+
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("stopTyping", userId);
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("A user got disconnected", socket.user.fullName);
+    console.log("A user got disconnected", socket.user.full_name);
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });

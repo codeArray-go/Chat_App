@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 function ChatHeader() {
   const { selectedUser, setSelectedUser, typingUsers, setIsSelectedUserFromList } = UseChatStore();
   const { onlineUsers } = useAuthStore();
-  const isOnline = onlineUsers.includes(selectedUser._id);
+  const isOnline = onlineUsers.includes(selectedUser.id);
   const closeRef = useRef(null);
 
   useEffect(() => {
@@ -30,8 +30,8 @@ function ChatHeader() {
         >
           <div className="w-12 rounded-full">
             <img
-              src={selectedUser.profilePic || "/avatar.png"}
-              alt={selectedUser.fullName}
+              src={selectedUser.profile_pic || "/avatar.png"}
+              alt={selectedUser.full_name}
             />
           </div>
         </div>
@@ -40,11 +40,11 @@ function ChatHeader() {
           <h3 className="text-slate-200 font-medium"
             onClick={() => navigateTo("/Dashboard")}
           >
-            {selectedUser.fullName}
+            {selectedUser.full_name}
           </h3>
           <p className="text-slate-400 text-sm">
             {isOnline
-              ? `${typingUsers[selectedUser._id] ? "typing..." : "online"}`
+              ? `${typingUsers[selectedUser.id] ? "typing..." : "online"}`
               : "Offline"}
           </p>
         </div>

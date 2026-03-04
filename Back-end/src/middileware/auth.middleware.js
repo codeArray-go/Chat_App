@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../lib/env.js";
-import User from "../models/User.js";
+import { pool } from "../lib/db.js";
 
 export const protectedRoute = async (req, res, next) => {
   try {
@@ -14,7 +14,12 @@ export const protectedRoute = async (req, res, next) => {
     if (!decode)
       return res.status(401).json({ message: "Unauthorized - Invalid Token." });
 
-    const user = await User.findById(decode.userId).select("-password");
+    const result = await pool.query(
+      `SELECT id, email, full_name, profile_pic FROM users WHERE id=$1`,
+      [decode.userId],
+    );
+
+    const user = result.rows[0];
     if (!user)
       return res
         .status(401)

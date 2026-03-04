@@ -11,7 +11,7 @@ import { Link } from "react-router";
 
 function SignUpPage() {
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
     password: "",
   });
@@ -74,9 +74,9 @@ function SignUpPage() {
               <input
                 type="text"
                 required
-                value={formData.fullName}
+                value={formData.full_name}
                 onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
+                  setFormData({ ...formData, full_name: e.target.value })
                 }
                 placeholder="Full name"
                 className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600"

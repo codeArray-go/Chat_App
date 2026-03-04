@@ -22,7 +22,6 @@ const App = () => {
 
     UseChatStore.getState().getNotification();
     UseChatStore.getState().initTypingListener();
-    UseChatStore.getState().getAllFriendRequest();
   }, [authUser]);
 
   if (isCheckingAuth) return <PageLoader />;
