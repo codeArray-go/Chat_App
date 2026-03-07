@@ -18,7 +18,7 @@ export const UseChatStore = create((set, get) => ({
   notificationCenterOpen: false,
   searchedUser: [],
   isSelectedUserFromList: false,
-  replyToMessage: null,
+  replyToMessage: "",
 
   setRelyToMessage: (message) => set({ replyToMessage: message }),
   setText: (text) => set({ text: text }),
