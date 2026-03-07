@@ -53,7 +53,7 @@ const ChatContainer = () => {
     }
   }, [messages, isTyping]);
 
-  //------ CHECKING CLICK OUTSIDE SELECTED BODIES ------
+  //------ Checking click outside selected bodies ------
 
   const SelectionDot = useRef(null);
   const SelectedList = useRef(null);
@@ -94,7 +94,7 @@ const ChatContainer = () => {
       {/*---- Messages ------*/}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length > 0 && !isMessageLoading ? (
-          <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+          <div className="max-w-4xl mx-auto space-y-3 sm:space-y-2.5">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -109,7 +109,7 @@ const ChatContainer = () => {
                 }
               >
                 <div
-                  className={`relative flex flex-col z-10 ${
+                  className={`relative flex flex-col ${
                     msg.sender_id === authUser.id ? "items-end" : "items-start"
                   }`}
                 >
@@ -125,7 +125,7 @@ const ChatContainer = () => {
                   )}
 
                   <div
-                    className={`relative max-w-[85%] sm:max-w-[70%] px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`relative max-w-[85%] sm:max-w-[70%] px-2 py-1 rounded-2xl transition-all duration-200 ${
                       msg.sender_id === authUser.id
                         ? `bg-[#1c2b4a] text-white rounded-br-sm ${msg.isOptimistic ? "opacity-70 -translate-x-1" : ""}`
                         : "bg-[#1a1b1f] text-slate-200 rounded-bl-sm border border-white/5"
@@ -142,13 +142,13 @@ const ChatContainer = () => {
 
                     {/* -------- Actual Message -------- */}
                     {msg.text && (
-                      <p className="text-[15px] leading-relaxed tracking-[0.2px] wrap-break-word">
+                      <p className="text-[15px] leading-relaxed tracking-[0.2px] wrap-break-word me-14">
                         {msg.text}
                       </p>
                     )}
-                    <p className="text-[11px] mt-2 opacity-40 text-right font-mono">
+                    <p className="text-[11px] -mt-3.5 opacity-40 text-right font-mono">
                       {new Date(msg.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
+                        hour: "numeric",
                         minute: "2-digit",
                       })}
                     </p>
