@@ -136,7 +136,7 @@ const ChatContainer = () => {
                       <img
                         src={msg.image}
                         alt="Shared"
-                        className="rounded-lg mb-2 max-h-72 w-full object-cover"
+                        className="rounded-lg mt-1 mb-5 max-h-72 w-full object-cover"
                       />
                     )}
 
