@@ -73,7 +73,7 @@ export const searchUser = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text, image, reply_to } = req.body;
     const { id: receiver_id } = req.params;
     const sender_id = req.user.id;
 
@@ -100,8 +100,8 @@ export const sendMessage = async (req, res) => {
 
     const newMessage = (
       await pool.query(
-        `INSERT INTO messages(sender_id, receiver_id, text, image) VALUES($1, $2, $3, $4) RETURNING *`,
-        [sender_id, receiver_id, text, imageUrl],
+        `INSERT INTO messages(sender_id, receiver_id, text, image, reply_to) VALUES($1, $2, $3, $4, $5) RETURNING *`,
+        [sender_id, receiver_id, text, imageUrl, reply_to],
       )
     ).rows[0];
 

@@ -13,13 +13,19 @@ function ProfileHeader() {
     const file = e.target.files[0];
     if (!file) return;
 
-    /* ---------- VALIDATING FILE TYPE ---------- */
+    /*-----------------------
+     Validating file type 
+    -------------------------*/
     if (!file.type.startsWith("image/")) {
       toast.error("Please select a valid image file");
       return;
     }
 
-    /* ---------- VALIDATING FILE SIZE (2MB limit) ---------- */
+    /*------------------------------------ 
+      Validating file size:- 
+       It limit uploading file to be on 
+       size 2mb only.
+    -------------------------------------*/
     const MAX_SIZE = 2 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       toast.error("Image size must be less than 2MB");
@@ -50,8 +56,8 @@ function ProfileHeader() {
     <div className="p-6 border-b border-gray-500/15">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* AVATAR */}
-          <div className="avatar border-2 border-cyan-700 rounded-full">
+          {/*------ Avatar -----*/}
+          <div className="avatar rounded-full">
             <button
               className="size-14 rounded-full overflow-hidden relative group cursor-pointer"
               onClick={() => fileInputRef.current.click()}
@@ -75,7 +81,7 @@ function ProfileHeader() {
             />
           </div>
 
-          {/* USERNAME */}
+          {/*------ Username ------*/}
           <div>
             <h3 className="text-slate-200 font-semibold text-base max-w-45 truncate">
               {authUser.full_name}
@@ -83,9 +89,8 @@ function ProfileHeader() {
           </div>
         </div>
 
-        {/* BUTTONS */}
+        {/*----- Buttons ------*/}
         <div className="flex gap-4 items-center relative">
-          {/* LOGOUT BTN */}
           <div
             onClick={() => {
               setOpenMenu((prev) => !prev);

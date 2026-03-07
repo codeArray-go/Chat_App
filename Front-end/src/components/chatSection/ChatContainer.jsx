@@ -17,7 +17,6 @@ const ChatContainer = () => {
     isTyping,
     typingUsers,
     deleteMessage,
-    setTextReply,
     setRelyToMessage,
   } = UseChatStore();
 
@@ -44,7 +43,7 @@ const ChatContainer = () => {
   useEffect(() => {
     subscribeToMessages();
 
-    // cleanUp
+    //---- CleanUp ------
     return () => unsubscribeToMessages();
   }, [subscribeToMessages, unsubscribeToMessages]);
 
@@ -54,7 +53,7 @@ const ChatContainer = () => {
     }
   }, [messages, isTyping]);
 
-  // CHECKING CLICK OUTSIDE SELECTED BODIES
+  //------ CHECKING CLICK OUTSIDE SELECTED BODIES ------
 
   const SelectionDot = useRef(null);
   const SelectedList = useRef(null);
@@ -92,7 +91,7 @@ const ChatContainer = () => {
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">
       <ChatHeader />
-      {/* Messages */}
+      {/*---- Messages ------*/}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
@@ -110,37 +109,44 @@ const ChatContainer = () => {
                 }
               >
                 <div
-                  className={`chat z-10 ${
-                    msg.sender_id === authUser.id ? "chat-end" : "chat-start"
+                  className={`relative flex flex-col z-10 ${
+                    msg.sender_id === authUser.id ? "items-end" : "items-start"
                   }`}
                 >
+                  {/* -------- Reply Preview (if exists) -------- */}
+                  {msg.reply_to && (
+                    <div className="mb-2 pl-3 border-l-2 border-white/20">
+                      <p className="text-xs opacity-50 mb-0.5">reply to</p>
+
+                      <p className="text-sm opacity-70 line-clamp-2 wrap-break-word">
+                        {msg.reply_to}
+                      </p>
+                    </div>
+                  )}
+
                   <div
-                    className={`chat-bubble relative rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 max-w-[85%] sm:max-w-[70%] wrap-break-word transition-all duration-300 ease-out
-                ${
-                  msg.sender_id === authUser.id
-                    ? `bg-blue-900 text-white rounded-br-none ${
-                        msg.isOptimistic
-                          ? "-translate-x-3 opacity-80"
-                          : "translate-x-0"
-                      }`
-                    : "bg-[#2f2f30d0] text-slate-200 rounded-bl-none"
-                }
-              `}
+                    className={`relative max-w-[85%] sm:max-w-[70%] px-4 py-3 rounded-xl transition-all duration-200 ${
+                      msg.sender_id === authUser.id
+                        ? `bg-[#1c2b4a] text-white rounded-br-sm ${msg.isOptimistic ? "opacity-70 -translate-x-1" : ""}`
+                        : "bg-[#1a1b1f] text-slate-200 rounded-bl-sm border border-white/5"
+                    }`}
                   >
-                    {/* Image */}
+                    {/*---- Image ------*/}
                     {msg.image && (
                       <img
                         src={msg.image}
                         alt="Shared"
-                        className="rounded-lg mt-1.5 max-h-60 sm:max-h-72 w-full object-cover"
+                        className="rounded-lg mb-2 max-h-72 w-full object-cover"
                       />
                     )}
+
+                    {/* -------- Actual Message -------- */}
                     {msg.text && (
-                      <p className="mt-1 text-sm sm:text-base leading-relaxed">
+                      <p className="text-[15px] leading-relaxed tracking-[0.2px] wrap-break-word">
                         {msg.text}
                       </p>
                     )}
-                    <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
+                    <p className="text-[11px] mt-2 opacity-40 text-right font-mono">
                       {new Date(msg.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -174,16 +180,12 @@ const ChatContainer = () => {
                       <div
                         ref={SelectedList}
                         className={`absolute top-12 
-                        ${msg.sender_id === authUser.id ? "-left-44" : "-right-44"} 
-                        bg-zinc-900 border border-white/10 rounded-xl shadow-xl 
-                        min-w-40 max-w-50 overflow-hidden z-50`}
+                        ${msg.sender_id === authUser.id ? "-left-44" : "-right-44"} bg-zinc-900 border border-white/10 rounded-xl shadow-xl min-w-40 max-w-50 overflow-hidden z-50`}
                       >
-                        {/* Reply */}
+                        {/* ------ Reply ------ */}
                         <button
                           className="flex items-center gap-3 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition"
-                          onClick={() => {
-                            (setRelyToMessage(msg.text), setTextReply(true));
-                          }}
+                          onClick={() => setRelyToMessage(msg)}
                         >
                           <Reply size={18} />
                           <span>Reply</span>
@@ -213,7 +215,7 @@ const ChatContainer = () => {
                                mark it seen else sent timing. 
                     -------------------------------------------------- */}
                 {msg.id === lastSentMessageId && (
-                  <p className="text-gray-500 text-sm text-right">
+                  <p className="text-gray-500 text-xs text-right mt-2">
                     {msg.is_seen
                       ? "Seen"
                       : `Sent at ${msgSentTime(msg.created_at)}`}
@@ -222,7 +224,11 @@ const ChatContainer = () => {
               </div>
             ))}
 
-            {/* 2. TYPING INDICATOR  */}
+            {/* -------------------------------------------------------------
+                TYPING INDICATOR 
+                  Shows when the other user is typing and displays a small
+                  animated indicator until they stop or send the message.
+            -------------------------------------------------------------- */}
             {typingUsers[selectedUser?.id] && (
               <div className="chat chat-start">
                 <div className="chat-bubble bg-gray-800 text-xs italic opacity-50 flex items-center gap-1 rounded-2xl rounded-bl-none px-5 py-3">
@@ -231,7 +237,7 @@ const ChatContainer = () => {
               </div>
             )}
 
-            {/* 3. SCROLL ANCHOR */}
+            {/*------ SCROLL ANCHOR ------*/}
             <div ref={messageEndRef} />
           </div>
         ) : isMessageLoading ? (
