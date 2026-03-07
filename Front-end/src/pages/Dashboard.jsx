@@ -19,12 +19,12 @@ const Dashboard = () => {
           {/* Profile Header Section */}
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center text-center sm:text-left">
             {/* ProfilePic - Fixed size with responsive adjustment if needed */}
-            <div className="h-32 w-32 border-2 border-slate-300 rounded-full overflow-hidden flex-shrink-0">
+            <div className="h-32 w-32 border-2 border-slate-300 rounded-full overflow-hidden shrink-0">
               <img
                 src={
                   (selectedUser
-                    ? selectedUser.profilePic
-                    : authUser.profilePic) || "/avatar.png"
+                    ? selectedUser.profile_pic
+                    : authUser.profile_pic) || "/avatar.png"
                 }
                 alt="userProfilePic"
                 className="h-full w-full object-cover"
@@ -34,7 +34,7 @@ const Dashboard = () => {
             {/* Other detail */}
             <div className="flex flex-col">
               <h1 className="font-bold text-2xl text-white">
-                {selectedUser ? selectedUser.fullName : authUser.fullName}
+                {selectedUser ? selectedUser.full_name : authUser.full_name}
               </h1>
               {/* Add bio or stats here later */}
             </div>

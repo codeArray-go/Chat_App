@@ -18,14 +18,9 @@ export const UseChatStore = create((set, get) => ({
   notificationCenterOpen: false,
   searchedUser: [],
   isSelectedUserFromList: false,
-  isSendingRequest: false,
-  friendRequests: [],
-  replyTo: null,
-  TextReply: false,
   replyToMessage: null,
 
   setRelyToMessage: (message) => set({ replyToMessage: message }),
-  setTextReply: (bool) => set({ TextReply: bool }),
   setText: (text) => set({ text: text }),
   setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -33,7 +28,6 @@ export const UseChatStore = create((set, get) => ({
   setNotificationCenteOpen: (val) => set({ notificationCenterOpen: val }),
   clearSearchedUser: () => set({ searchedUser: [] }),
   setIsSelectedUserFromList: (bool) => set({ isSelectedUserFromList: bool }),
-  setReply: (message_id) => set({ replyTo: message_id }),
 
   getAllContacts: async () => {
     set({ isUserLoading: true });
@@ -125,6 +119,7 @@ export const UseChatStore = create((set, get) => ({
       sender_id: authUser.id,
       receiver_id: selectedUser.id,
       text: messageData.text,
+      reply_to: messageData.reply_to,
       image: messageData.image,
       created_at: new Date().toISOString(),
       is_seen: false,

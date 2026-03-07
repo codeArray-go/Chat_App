@@ -25,6 +25,7 @@ export const createTables = async () => {
 
       text TEXT,
       image TEXT DEFAULT NULL,
+      reply_to TEXT DEFAULT NULL,
       is_seen BOOLEAN DEFAULT false,
 
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
