@@ -5,7 +5,15 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const MessageInput = () => {
-  const { selectedUser, text, setText } = UseChatStore();
+  const {
+    selectedUser,
+    text,
+    setText,
+    TextReply,
+    setTextReply,
+    setRelyToMessage,
+    replyToMessage,
+  } = UseChatStore();
   const { socket } = useAuthStore();
 
   const [imgPreview, setImgPreview] = useState(null);
@@ -102,6 +110,39 @@ const MessageInput = () => {
               <XIcon className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* TEXT REPLY */}
+      {TextReply && (
+        <div className="max-w-3xl mx-auto mb-2 flex justify-between p-2 relative">
+          <div>
+            <p>{replyToMessage}</p>
+            <img
+              src={imgPreview}
+              alt="Preview"
+              className="
+            w-16 h-16 sm:w-20 sm:h-20
+            object-cover rounded-lg
+            border border-slate-700
+          "
+            />
+          </div>
+          <button
+            onClick={() => {
+              (setTextReply(false), setRelyToMessage(null));
+            }}
+            type="button"
+            className="
+            absolute -top-2 -right-2
+            w-5 h-5 sm:w-6 sm:h-6
+            rounded-full bg-slate-800
+            flex items-center justify-center
+            text-slate-200 hover:bg-slate-700
+          "
+          >
+            <XIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+          </button>
         </div>
       )}
 

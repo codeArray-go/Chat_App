@@ -17,10 +17,10 @@ const io = new Server(server, {
 
 io.use(socketAuthMiddleware);
 
-// STORE ONLINE USERS
+// ------ STORE ONLINE USERS ------
 const userSocketMap = {};
 
-// IF USER IS ONLINE OR NOT
+// ------ IF USER IS ONLINE OR NOT ------
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  // LISTEN TO TYPING MESSAGE FROM CLIENT
+  //------ LISTEN TO TYPING MESSAGE FROM CLIENT ------
   socket.on("typing", (receiver_id) => {
     const receiverSocketId = getReceiverSocketId(receiver_id);
 
@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // MESSAGE SEEN OR NOT
+  //------ MESSAGE SEEN OR NOT ------
   socket.on("markMessagesAsSeen", async ({ messagesender_id, myId }) => {
     const alreadySeen = (
       await pool.query(
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // STOP TYPING ANIMATION
+  //------ STOP TYPING ANIMATION ------
   socket.on("stopTyping", (receiver_id) => {
     const receiverSocketId = getReceiverSocketId(receiver_id);
 

@@ -21,7 +21,11 @@ export const UseChatStore = create((set, get) => ({
   isSendingRequest: false,
   friendRequests: [],
   replyTo: null,
+  TextReply: false,
+  replyToMessage: null,
 
+  setRelyToMessage: (message) => set({ replyToMessage: message }),
+  setTextReply: (bool) => set({ TextReply: bool }),
   setText: (text) => set({ text: text }),
   setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
