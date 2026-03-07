@@ -14,12 +14,13 @@ export const protectedRoute = async (req, res, next) => {
     if (!decode)
       return res.status(401).json({ message: "Unauthorized - Invalid Token." });
 
-    const result = await pool.query(
-      `SELECT id, email, full_name, profile_pic FROM users WHERE id=$1`,
-      [decode.userId],
-    );
+    const user = (
+      await pool.query(
+        `SELECT id, email, full_name, profile_pic FROM users WHERE id=$1`,
+        [decode.userId],
+      )
+    ).rows[0];
 
-    const user = result.rows[0];
     if (!user)
       return res
         .status(401)

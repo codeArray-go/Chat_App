@@ -129,7 +129,6 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-// GET NOTIFICATION FROM DATABASE
 export const getNotification = async (req, res) => {
   try {
     const myId = req.user.id;
@@ -157,17 +156,19 @@ export const getChatParameter = async (req, res) => {
   try {
     const loggedInUserId = req.user.id;
 
-    // FIND ALL THE MESSAGE WHERE THE LOGGED-IN USER IS EITHER A RECIEVER OR A SENDER.
+    // --------- Fetch user IDs that have chatted with the logged-in user ---------
     const chatPartenersId = (
       await pool.query(
-        `SELECT DISTINCT CASE WHEN sender_id = $1 THEN receiver_id
-        ELSE sender_id END AS partner_id
-        FROM messages WHERE sender_id = $1 OR receiver_id = $1;`,
+        `SELECT DISTINCT
+          CASE
+            WHEN sender_id = $1 THEN receiver_id
+            ELSE sender_id
+          END AS partner_id
+        FROM messages
+        WHERE sender_id = $1 OR receiver_id = $1`,
         [loggedInUserId],
       )
     ).rows.map((row) => row.partner_id);
-
-    console.log(chatPartenersId.length);
 
     if (chatPartenersId.length === 0) return res.json([]);
 
@@ -180,7 +181,7 @@ export const getChatParameter = async (req, res) => {
 
     res.status(200).json(chatParteners);
   } catch (error) {
-    console.log("Error in getChatparameter: ", error.message);
+    console.error("getChatparameter error:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

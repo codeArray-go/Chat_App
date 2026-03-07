@@ -12,22 +12,22 @@ export const genrateToken = (userId, res) => {
   });
 
   // FOR DEVELOPMENT :-
-//   res.cookie("jwt", token, {
-//     maxAge: 7 * 24 * 60 * 60 * 1000,
-//     httpOnly: true,
-//     sameSite: "strict",
-//     path: "/",
-//   });
+  res.cookie("jwt", token, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/",
+  });
 
 
   // FOR PRODUCTION:-
-  res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true, // prevent XSS attacks: cross-site scripting
-    sameSite: "none",
-    secure: true,
-    path: "/",
-  });
+  // res.cookie("jwt", token, {
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   httpOnly: true, // prevent XSS attacks: cross-site scripting
+  //   sameSite: "none",
+  //   secure: true,
+  //   path: "/",
+  // });
 
   return token;
 };

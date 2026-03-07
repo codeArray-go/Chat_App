@@ -17,6 +17,8 @@ const ChatContainer = () => {
     isTyping,
     typingUsers,
     deleteMessage,
+    setTextReply,
+    setRelyToMessage,
   } = UseChatStore();
 
   const [hoveredToMessage, setHoveredToMessage] = useState(null);
@@ -97,7 +99,9 @@ const ChatContainer = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className="relative"
+                className={`relative ${
+                  messageSelected === msg.id ? "z-50" : "z-0"
+                }`}
                 onMouseEnter={() =>
                   !messageSelected && setHoveredToMessage(msg.id)
                 }
@@ -106,7 +110,7 @@ const ChatContainer = () => {
                 }
               >
                 <div
-                  className={`chat ${
+                  className={`chat z-10 ${
                     msg.sender_id === authUser.id ? "chat-end" : "chat-start"
                   }`}
                 >
@@ -123,7 +127,31 @@ const ChatContainer = () => {
                 }
               `}
                   >
-                    {/* THREE DOTS ON HOVER */}
+                    {/* Image */}
+                    {msg.image && (
+                      <img
+                        src={msg.image}
+                        alt="Shared"
+                        className="rounded-lg mt-1.5 max-h-60 sm:max-h-72 w-full object-cover"
+                      />
+                    )}
+                    {msg.text && (
+                      <p className="mt-1 text-sm sm:text-base leading-relaxed">
+                        {msg.text}
+                      </p>
+                    )}
+                    <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
+                      {new Date(msg.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+
+                    {/* --------------------------------------------------
+                    HOVER CONTROLS 
+                    PURPOSE: Show 3-dot action menu on hover 
+                    TRIGGER: hoveredToMessage === msg.id
+                    -------------------------------------------------- */}
                     {hoveredToMessage === msg.id && (
                       <div
                         className={`absolute top-1/2 -translate-y-1/2 ${msg.sender_id === authUser.id ? "-left-8" : "-right-8"} cursor-pointer hover:bg-white/10 rounded-full p-1.5 transition`}
@@ -137,19 +165,31 @@ const ChatContainer = () => {
                       </div>
                     )}
 
-                    {/* LIST TO PERFORM EXTRA TASK */}
+                    {/* -------------------------------------------------- 
+                    CONTEXT MENU
+                    actions: - Reply - Delete (only for message owner) 
+                    Visible when: messageSelected === msg.id
+                    -------------------------------------------------- */}
                     {messageSelected === msg.id && (
                       <div
                         ref={SelectedList}
-                        className={`absolute top-8 ${msg.sender_id === authUser.id ? "right-28" : "left-28"} bg-zinc-900 border border-white/10 rounded-xl shadow-xl min-w-40 overflow-hidden`}
+                        className={`absolute top-12 
+                        ${msg.sender_id === authUser.id ? "-left-44" : "-right-44"} 
+                        bg-zinc-900 border border-white/10 rounded-xl shadow-xl 
+                        min-w-40 max-w-50 overflow-hidden z-50`}
                       >
                         {/* Reply */}
-                        <button className="flex items-center gap-3 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition">
+                        <button
+                          className="flex items-center gap-3 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition"
+                          onClick={() => {
+                            (setRelyToMessage(msg.text), setTextReply(true));
+                          }}
+                        >
                           <Reply size={18} />
                           <span>Reply</span>
                         </button>
 
-                        {/* Delete */}
+                        {/* ------ Delete ------ */}
                         {msg.sender_id === authUser.id && (
                           <button
                             onClick={() => {
@@ -164,32 +204,14 @@ const ChatContainer = () => {
                         )}
                       </div>
                     )}
-
-                    {/* Image */}
-                    {msg.image && (
-                      <img
-                        src={msg.image}
-                        alt="Shared"
-                        className="rounded-lg mt-1.5 max-h-60 sm:max-h-72 w-full object-cover"
-                      />
-                    )}
-
-                    {msg.text && (
-                      <p className="mt-1 text-sm sm:text-base leading-relaxed">
-                        {msg.text}
-                      </p>
-                    )}
-
-                    <p className="text-[10px] sm:text-xs mt-1 opacity-70 text-right">
-                      {new Date(msg.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
                   </div>
                 </div>
 
-                {/* Seen or Sent Status  */}
+                {/* -------------------------------------------------- 
+                    SEEN OR SENT STATUS                
+                    actions: - If message seen by reciever will 
+                               mark it seen else sent timing. 
+                    -------------------------------------------------- */}
                 {msg.id === lastSentMessageId && (
                   <p className="text-gray-500 text-sm text-right">
                     {msg.is_seen
@@ -197,26 +219,6 @@ const ChatContainer = () => {
                       : `Sent at ${msgSentTime(msg.created_at)}`}
                   </p>
                 )}
-
-                {/* {messageSelected === msg.id && (
-                  <div
-                    className={`absolute top-full mt-1 z-50 
-    ${msg.sender_id === authUser.id ? "left-0" : "right-0"}
-    bg-black/80 rounded-xl p-1`}
-                    ref={SelectedList}
-                  >
-                    <button
-                      onClick={() => {
-                        deleteMessage(msg.id, selectedUser.id);
-                        setMessageSelected(null);
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-red-500/10 text-red-400 rounded-lg"
-                    >
-                      <img className="h-4" src="/close.svg" />
-                      Delete
-                    </button>
-                  </div>
-                )} */}
               </div>
             ))}
 
