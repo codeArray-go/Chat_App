@@ -89,7 +89,7 @@ const ChatContainer = () => {
   }, [messages, authUser.id]);
 
   return (
-    <div className="flex flex-col h-full bg-[#0d1117]">
+    <div className="flex flex-col h-dvh bg-[#0d1117]">
       <ChatHeader />
       {/*---- Messages ------*/}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
@@ -254,3 +254,4 @@ const ChatContainer = () => {
 };
 
 export default ChatContainer;
+
