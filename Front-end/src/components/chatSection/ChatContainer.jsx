@@ -89,10 +89,11 @@ const ChatContainer = () => {
   }, [messages, authUser.id]);
 
   return (
-    <div className="flex flex-col h-dvh bg-[#0d1117]">
+    <div className="h-dvh flex flex-col bg-[#0d1117] overflow-hidden">
+
       <ChatHeader />
       {/*---- Messages ------*/}
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 max-h-[calc(100dvh-5.25rem)]">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-3 sm:space-y-2.5">
             {messages.map((msg) => (

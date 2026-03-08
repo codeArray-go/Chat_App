@@ -5,7 +5,12 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router";
 
 function ChatHeader() {
-  const { selectedUser, setSelectedUser, typingUsers, setIsSelectedUserFromList } = UseChatStore();
+  const {
+    selectedUser,
+    setSelectedUser,
+    typingUsers,
+    setIsSelectedUserFromList,
+  } = UseChatStore();
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(selectedUser.id);
   const closeRef = useRef(null);
@@ -21,9 +26,7 @@ function ChatHeader() {
   const navigateTo = useNavigate();
 
   return (
-    <div
-      className="flex justify-between items-center bg-[#06070ae7] max-h-21 px-6 flex-1 cursor-pointer"
-    >
+    <div className="flex sm:relative justify-between items-center bg-[#06070ae7] max-h-21 px-6 flex-1 cursor-pointer shrink-0">
       <div className="flex items-center space-x-3">
         <div
           className={`avatar ${isOnline ? "avatar-online" : "avatar-offline"}`}
@@ -37,7 +40,8 @@ function ChatHeader() {
         </div>
 
         <div>
-          <h3 className="text-slate-200 font-medium"
+          <h3
+            className="text-slate-200 font-medium"
             onClick={() => navigateTo("/Dashboard")}
           >
             {selectedUser.full_name}
@@ -53,8 +57,8 @@ function ChatHeader() {
       <button
         className="hover:bg-[rgba(255,255,255,0.08)] rounded-full p-2.5"
         onClick={() => {
-          setSelectedUser(null)
-          setIsSelectedUserFromList(false)
+          setSelectedUser(null);
+          setIsSelectedUserFromList(false);
         }}
       >
         <XIcon
