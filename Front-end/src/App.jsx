@@ -24,6 +24,13 @@ const App = () => {
     UseChatStore.getState().initTypingListener();
   }, [authUser]);
 
+    useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   if (isCheckingAuth) return <PageLoader />;
 
   return (
@@ -54,3 +61,4 @@ const App = () => {
 };
 
 export default App;
+
