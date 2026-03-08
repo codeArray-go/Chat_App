@@ -77,7 +77,7 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="border-t border-[#2f2f30d0] px-2 sm:px-4 py-2 bg-[#06070ae7]">
+    <div className="border-t border-[#2f2f30d0] px-2 sm:px-4 py-2 bg-[#06070ae7] shrink-0">
       {/*------ Image Preview ------*/}
       {imgPreview && (
         <div className="max-w-3xl mx-auto mb-2 flex items-center">
