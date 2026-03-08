@@ -26,7 +26,7 @@ function ChatHeader() {
   const navigateTo = useNavigate();
 
   return (
-    <div className="flex sm:relative justify-between items-center bg-[#06070ae7] max-h-21 px-6 flex-1 cursor-pointer shrink-0">
+    <div className="flex sm:relative justify-between items-center bg-[#06070ae7] max-h-21 px-6 flex-1 cursor-pointer">
       <div className="flex items-center space-x-3">
         <div
           className={`avatar ${isOnline ? "avatar-online" : "avatar-offline"}`}
