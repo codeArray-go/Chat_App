@@ -90,6 +90,7 @@ const ChatContainer = () => {
 
   return (
     <div className="h-dvh flex flex-col bg-[#0d1117] overflow-hidden">
+
       <ChatHeader />
       {/*---- Messages ------*/}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 max-h-[calc(100dvh-5.25rem)]">
@@ -254,3 +255,4 @@ const ChatContainer = () => {
 };
 
 export default ChatContainer;
+
