@@ -13,8 +13,8 @@ import {
 
 const router = express.Router();
 
-router.use(arcjetProtection, protectedRoute);
-// router.use(protectedRoute);
+// router.use(arcjetProtection, protectedRoute);
+router.use(protectedRoute);
 
 router.get("/contacts", getAllContacts);
 router.get("/chats", getChatParameter);

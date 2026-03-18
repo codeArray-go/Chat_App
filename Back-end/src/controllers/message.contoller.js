@@ -58,6 +58,7 @@ export const searchUser = async (req, res) => {
 
     if (!query) return;
 
+
     const searchQuery = (
       await pool.query(
         `SELECT id, email, full_name, profile_pic FROM users WHERE full_name ILIKE '%' || $1 || '%'`,
