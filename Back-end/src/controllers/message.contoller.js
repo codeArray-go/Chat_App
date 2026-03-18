@@ -43,13 +43,13 @@ export const searchUser = async (req, res) => {
 
     if (!query) return;
 
-    const searchQuery = await User.find({ fullName: { $regex: query } })
+    const searchQuery = await User.find({ fullName: { $regex: query } });
 
     res.status(200).json(searchQuery);
   } catch (error) {
-    console.log("Error in searching", error)
+    console.log("Error in searching", error);
   }
-}
+};
 
 export const sendMessage = async (req, res) => {
   try {
@@ -165,5 +165,24 @@ export const getChatParameter = async (req, res) => {
   } catch (error) {
     console.log("Error in getChatparameter: ", error.message);
     res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export const deleteMessage = async (req, res) => {
+  const { senderId, receiverId, message, createdAt } = req.body;
+
+  try {
+    if (!message && !senderId) return;
+    await Message.deleteOne({
+      senderId: senderId,
+      receiverId: receiverId,
+      text: message,
+      createdAt: createdAt,
+    });
+
+    res.status(200).json({ message: "Message deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error." });
+    console.log(error);
   }
 };
