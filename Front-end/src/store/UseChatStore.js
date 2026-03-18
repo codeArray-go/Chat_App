@@ -18,9 +18,11 @@ export const UseChatStore = create((set, get) => ({
   notificationCenterOpen: false,
   searchedUser: [],
   isSelectedUserFromList: false,
-  isSendingRequest: false,
-  friendRequests: [],
+  replyToMessage: "",
+  editProfile: false,
 
+  setEditProfile: (bool) => set({editProfile: bool}),
+  setRelyToMessage: (message) => set({ replyToMessage: message }),
   setText: (text) => set({ text: text }),
   setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -28,35 +30,6 @@ export const UseChatStore = create((set, get) => ({
   setNotificationCenteOpen: (val) => set({ notificationCenterOpen: val }),
   clearSearchedUser: () => set({ searchedUser: [] }),
   setIsSelectedUserFromList: (bool) => set({ isSelectedUserFromList: bool }),
-
-  getAllFriendRequest: async () => {
-    try {
-      const res = await axiosInstance.get("/request/getFriendRequest")
-      const requests = res.data
-      set({ friendRequests: requests })
-    } catch (error) {
-      toast.error("Error in fetching all request")
-      console.log(error);
-    }
-  },
-
-  sendFriendRequest: async () => {
-    set({ isSendingRequest: true })
-
-    const { selectedUser } = get();
-    try {
-      await axiosInstance.post("/request/sended", {
-        receiverId: selectedUser._id
-      });
-
-      toast.success("Successfully sended your fiend Request")
-    } catch (error) {
-      toast.error("error Sending friend Request.")
-      console.log(error)
-    } finally {
-      set({ isSendingRequest: false })
-    }
-  },
 
   getAllContacts: async () => {
     set({ isUserLoading: true });
@@ -98,7 +71,8 @@ export const UseChatStore = create((set, get) => ({
         }));
       });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error("error in getting chat partneres");
+      console.log(error.response.data.message);
     } finally {
       set({ isUserLoading: false });
     }
@@ -125,7 +99,7 @@ export const UseChatStore = create((set, get) => ({
       set((state) => {
         const updated = { ...state.notifications };
         response.forEach((element) => {
-          updated[element._id] = element.count;
+          updated[element.id] = element.count;
         });
 
         return { notifications: updated };
@@ -143,38 +117,55 @@ export const UseChatStore = create((set, get) => ({
     const tmpID = `tmp-${Date.now()}`;
 
     const optimisticMessage = {
-      _id: tmpID,
-      senderId: authUser._id,
-      receiverId: selectedUser._id,
+      id: tmpID,
+      sender_id: authUser.id,
+      receiver_id: selectedUser.id,
       text: messageData.text,
+      reply_to: messageData.reply_to,
       image: messageData.image,
-      createdAt: new Date().toISOString(),
-      isSeen: false,
+      created_at: new Date().toISOString(),
+      is_seen: false,
       isOptimistic: true,
     };
+
     set((state) => ({
       messages: [...state.messages, optimisticMessage],
     }));
 
     try {
       const res = await axiosInstance.post(
-        `/messages/send/${selectedUser._id}`,
+        `/messages/send/${selectedUser.id}`,
         messageData,
       );
 
       set((state) => ({
         messages: state.messages.map((msg) =>
-          msg._id === tmpID ? res.data : msg,
+          msg.id === tmpID ? res.data : msg,
         ),
       }));
 
-      return selectedUser._id;
+      return selectedUser.id;
     } catch (error) {
       set({ messages: messages });
       toast.error(
         error.response?.data?.message ||
-        "Something went wrong sending messages.",
+          "Something went wrong sending messages.",
       );
+    }
+  },
+
+  deleteMessage: async (message_id) => {
+    const { messages } = get();
+    try {
+      await axiosInstance.post("/messages/delete", {
+        message_id: message_id,
+      });
+
+      const updatedMessages = messages.filter((msg) => msg.id !== message_id);
+      set({ messages: updatedMessages });
+    } catch (error) {
+      toast.error("Error while deleting message");
+      console.log("Error while deleting message: ", error);
     }
   },
 
@@ -189,6 +180,7 @@ export const UseChatStore = create((set, get) => ({
     socket.off("newMessage");
     socket.off("unreadCountUpdateAfterSeen");
     socket.off("messagesSeenByPeer");
+    socket.off("DeleteMsgId");
 
     if (!selectedUser) return;
 
@@ -197,13 +189,26 @@ export const UseChatStore = create((set, get) => ({
 
       if (
         selectedUser &&
-        (newMessage.senderId === selectedUser._id ||
-          newMessage.receiverId === selectedUser._id)
+        (newMessage.sender_id === selectedUser.id ||
+          newMessage.receiver_id === selectedUser.id)
       ) {
-        set((state) => ({
-          messages: [...state.messages, newMessage],
-        }));
+        set((state) => {
+          const exists = state.messages.some((msg) => msg.id === newMessage.id);
+
+          if (exists) return state;
+
+          return {
+            messages: [...state.messages, newMessage],
+          };
+        });
       }
+    });
+
+    socket.on("DeletedMsgId", (message_id) => {
+      const { messages } = get();
+
+      const updatedMessages = messages.filter((msg) => msg.id !== message_id);
+      set({ messages: updatedMessages });
     });
 
     socket.on("messagesSeenByPeer", (peerId) => {
@@ -211,7 +216,7 @@ export const UseChatStore = create((set, get) => ({
 
       set((state) => ({
         messages: state.messages.map((msg) =>
-          msg.receiverId === peerId ? { ...msg, isSeen: true } : msg,
+          msg.receiver_id === peerId ? { ...msg, is_seen: true } : msg,
         ),
       }));
     });
@@ -234,16 +239,16 @@ export const UseChatStore = create((set, get) => ({
     socket.off("typing");
     socket.off("stopTyping");
 
-    socket.on("typing", (senderId) => {
+    socket.on("typing", (sender_id) => {
       set((state) => ({
-        typingUsers: { ...state.typingUsers, [senderId]: true },
+        typingUsers: { ...state.typingUsers, [sender_id]: true },
       }));
     });
 
-    socket.on("stopTyping", (senderId) => {
+    socket.on("stopTyping", (sender_id) => {
       set((state) => {
         const update = { ...state.typingUsers };
-        delete update[senderId];
+        delete update[sender_id];
         return { typingUsers: update };
       });
     });

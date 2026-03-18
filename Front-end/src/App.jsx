@@ -22,8 +22,14 @@ const App = () => {
 
     UseChatStore.getState().getNotification();
     UseChatStore.getState().initTypingListener();
-    UseChatStore.getState().getAllFriendRequest();
   }, [authUser]);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   if (isCheckingAuth) return <PageLoader />;
 
@@ -55,3 +61,5 @@ const App = () => {
 };
 
 export default App;
+
+

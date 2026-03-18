@@ -1,15 +1,13 @@
-import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 import { genrateToken } from "../lib/utils.js";
-import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import { ENV } from "../lib/env.js";
 import cloudinary from "../lib/cloudinary.js";
+import { pool } from "../lib/db.js";
 
 export const signup = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { full_name, email, password } = req.body;
 
   try {
-    if (!fullName || !email || !password) {
+    if (!full_name || !email || !password) {
       return res.status(400).json({ messsage: "All field are required" });
     }
 
@@ -24,8 +22,11 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email });
-    if (user) {
+    const user = (
+      await pool.query(`SELECT * FROM users WHERE email=$1`, [email])
+    ).rows;
+
+    if (user.length > 0) {
       return res.status(400).json({
         message:
           "User already existing, try creating with different email address.",
@@ -36,33 +37,22 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(password, salt);
 
-    const newUser = new User({
-      fullName,
-      email,
-      password: hashedPass,
-    });
+    const newUser = await pool.query(
+      `INSERT INTO users(full_name, email, password) VALUES($1, $2, $3) RETURNING id, full_name, email, profile_pic`,
+      [full_name, email, hashedPass],
+    );
 
-    if (newUser) {
-      // Persist User first and then issue auth cookie
-      const savedUser = await newUser.save();
-      genrateToken(savedUser._id, res);
+    const result = newUser.rows[0];
+
+    if (result) {
+      genrateToken(result.id, res);
 
       res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
+        id: result.id,
+        full_name: result.full_name,
+        email: result.email,
+        profile_pic: result.profile_pic,
       });
-
-      try {
-        await sendWelcomeEmail(
-          savedUser.email,
-          savedUser.fullName,
-          ENV.CLIENT_URL,
-        );
-      } catch (error) {
-        console.error("Error sending email.");
-      }
     } else {
       res.status(400).json({ message: "Invalid user credantial" });
     }
@@ -80,19 +70,23 @@ export const login = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email });
+    const check = await pool.query(`SELECT * FROM users WHERE email=$1`, [
+      email,
+    ]);
+
+    const user = check.rows[0];
     if (!user) return res.status(400).json({ message: "Invalid credentials." });
 
     const pass = await bcrypt.compare(password, user.password);
     if (!pass) return res.status(400).json({ message: "Invalid credentials." });
 
-    genrateToken(user._id, res);
+    genrateToken(user.id, res);
 
     res.status(200).json({
-      _id: user._id,
+      id: user.id,
       email: user.email,
-      fullName: user.fullName,
-      profilePic: user.profilePic,
+      full_name: user.full_name,
+      profile_pic: user.profile_pic,
     });
   } catch (error) {
     console.log("Error in login controller: ", error);
@@ -107,21 +101,20 @@ export const logout = (_, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
-    if (!profilePic)
+    const { profile_pic } = req.body;
+    if (!profile_pic)
       return res.status(400).json({ message: "Profile pic is required" });
 
-    const userId = req.user._id;
+    const userId = req.user.id;
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    const uploadResponse = await cloudinary.uploader.upload(profile_pic);
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true },
+    const update = await pool.query(
+      `UPDATE users SET profile_pic=$1 WHERE id=$2`,
+      [uploadResponse.secure_url, userId],
     );
 
-    res.status(200).json(updatedUser);
+    res.status(200).json({ message: "Successfully updated message." });
   } catch (error) {
     console.log("Error in update profile:", error);
     res.status(500).json({ message: "Internal server error" });

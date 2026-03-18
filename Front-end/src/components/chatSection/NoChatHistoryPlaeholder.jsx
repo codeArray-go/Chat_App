@@ -22,7 +22,7 @@ const NoChatHistoryPlaceholder = ({ name }) => {
       </div>
       <div className="flex flex-wrap gap-2 justify-center">
         <button
-          onClick={() => setText("👋 Say Hello")}
+          onClick={() => setText("👋 Hello")}
           className="px-4 py-2 text-xs font-medium text-white bg-[#161a20] rounded-full hover:bg-gray-400/15 transition-colors">
           👋 Say Hello
         </button>

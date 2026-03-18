@@ -13,14 +13,14 @@ const ChatsList = () => {
     selectedUser,
     typingUsers,
     notifications,
-    setIsSelectedUserFromList
+    setIsSelectedUserFromList,
+    getMessageByUserId,
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getMyChatPartners();
   }, [getMyChatPartners]);
-
 
   if (isUserLoading) return <UsersLoadingSkeleton />;
   if (chats.length == 0) return <NoChatsFound />;
@@ -30,44 +30,45 @@ const ChatsList = () => {
       <h1 className="font-bold mb-2 mx-3 text-base">Chat List</h1>
       {chats.map((chat) => (
         <div
-          key={chat._id}
+          key={chat.id}
           className={`tap-effect rounded-lg flex items-center justify-between gap-3 p-2.5 cursor-pointer transition-all 
-            ${selectedUser?._id === chat._id
-              ? "bg-[#18181b]" : "bg-transparent hover:bg-[#0d1117]"
+            ${
+              selectedUser?.id === chat.id
+                ? "bg-[#18181b]"
+                : "bg-transparent hover:bg-[#0d1117]"
             }
           `}
           onClick={() => {
-            setSelectedUser(chat)
-            setIsSelectedUserFromList(true)
+            setSelectedUser(chat);
+            setIsSelectedUserFromList(true);
+            getMessageByUserId(chat.id);
           }}
         >
           {" "}
           <div className="flex items-center gap-3">
             <div
-              className={`avatar ${onlineUsers.includes(chat._id) ? "avatar-online" : "avatar-offline"}`}
+              className={`avatar ${onlineUsers.includes(chat.id) ? "avatar-online" : "avatar-offline"}`}
             >
               <div className="size-14 rounded-full overflow-hidden">
                 <img
-                  src={chat.profilePic || "/avatar.png"}
-                  alt={chat.fullName}
+                  src={chat.profile_pic || "/avatar.png"}
+                  alt={chat.full_name}
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
             <div>
               <h4 className="text-slate-200 text-[15px] font-medium truncate">
-                {chat.fullName}
+                {chat.full_name}
               </h4>
-              {
-                typingUsers[chat._id] && (
-                  <p className="text-cyan-400 text-sm">typing...</p>
-                )
-              }
+              {typingUsers[chat.id] && (
+                <p className="text-cyan-400 text-sm">typing...</p>
+              )}
             </div>
           </div>
-          {notifications[chat._id] > 0 && (
+          {notifications[chat.id] > 0 && (
             <div className="rounded-full border border-green-400 text-xs text-green-500 font-medium px-2 py-0.5">
-              {notifications[chat._id]}
+              {notifications[chat.id]}
             </div>
           )}
         </div>

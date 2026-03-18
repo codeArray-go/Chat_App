@@ -3,7 +3,8 @@
 A full-stack real-time chat application built with modern web technologies.  
 This project enables users to communicate instantly with features like live messaging, unread message tracking, and real-time updates using WebSockets.
 
-<img width="1312" height="683" alt="Screenshot 2026-02-11 223818" src="https://github.com/user-attachments/assets/47777312-bf68-464a-8652-d4c482fb7869" />
+<img width="1244" height="692" alt="image" src="https://github.com/user-attachments/assets/012f9a90-5be3-409c-ba8a-166c55e87545" />
+
 
 ---
 
@@ -81,7 +82,7 @@ root/
 **Backend**
 - Node.js runtime
 - Express.js server
-- MongoDB database
+- PostgreSQL database
 - Socket.io for real-time communication
 
 ---
@@ -99,4 +100,6 @@ This project was built as a **learning-driven production-style application** to:
 ## 📄 License
 
 This project is open for learning and personal development use.
+
+
 

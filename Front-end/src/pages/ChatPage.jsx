@@ -31,7 +31,7 @@ const ChatPage = () => {
 
       {/* RIGHT PANEL */}
       <div
-        className={`bg-[#0d1117] flex-1 flex flex-col absolute sm:relative inset-0 z-10 transition-transform duration-300 ease-in-out ${selectedUser ? "translate-x-0 flex" : "translate-x-full sm:translate-x-0 hidden sm:flex"} `}
+        className={`bg-[#0d1117] flex-1 h-screen flex flex-col absolute sm:relative inset-0 z-10 transition-transform duration-300 ease-in-out ${selectedUser ? "translate-x-0 flex" : "translate-x-full sm:translate-x-0 hidden sm:flex"} `}
       >
         {isSelectedUserFromList ? (
           <ChatContainer />
