@@ -3,4 +3,7 @@ import { ENV } from "./env.js";
 
 export const pool = new Pool({
   connectionString: ENV.POSTDB_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });

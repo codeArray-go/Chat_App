@@ -93,7 +93,7 @@ const ChatContainer = () => {
 
       <ChatHeader />
       {/*---- Messages ------*/}
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 max-h-[calc(100dvh-5.25rem)]">
+      <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2 max-h-[calc(100dvh-5.25rem)]">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-3 sm:space-y-2.5">
             {messages.map((msg) => (
@@ -143,14 +143,14 @@ const ChatContainer = () => {
 
                     {/* -------- Actual Message -------- */}
                     {msg.text && (
-                      <p className="text-[15px] leading-relaxed tracking-[0.2px] wrap-break-word me-14">
+                      <p className="text-sm leading-relaxed tracking-[0.2px] wrap-break-word me-11">
                         {msg.text}
                       </p>
                     )}
-                    <p className="text-[11px] -mt-3.5 opacity-40 text-right font-mono">
+                    <p className="text-[9.5px] -mt-3.5 opacity-40 text-right">
                       {new Date(msg.created_at).toLocaleTimeString([], {
                         hour: "numeric",
-                        minute: "2-digit",
+                        minute: "numeric",
                       })}
                     </p>
 
