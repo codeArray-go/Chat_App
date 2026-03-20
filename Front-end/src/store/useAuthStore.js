@@ -4,9 +4,9 @@ import { toast } from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : process.env.NEXT_PUBLIC_BACKEND_URL;
+  // import.meta.env.MODE === "development"
+  //   ? "http://localhost:3000"
+  "https://chween-bfz7.onrender.com";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
