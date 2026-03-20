@@ -93,7 +93,7 @@ const ChatContainer = () => {
 
       <ChatHeader />
       {/*---- Messages ------*/}
-      <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2 max-h-[calc(100dvh-5.25rem)]">
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 max-h-[calc(100dvh-5.25rem)]">
         {messages.length > 0 && !isMessageLoading ? (
           <div className="max-w-4xl mx-auto space-y-3 sm:space-y-2.5">
             {messages.map((msg) => (
