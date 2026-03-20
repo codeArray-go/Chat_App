@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:3000"
-    : "https://chween.onrender.com";
+    : process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
