@@ -21,7 +21,7 @@ export const UseChatStore = create((set, get) => ({
   replyToMessage: "",
   editProfile: false,
 
-  setEditProfile: (bool) => set({editProfile: bool}),
+  setEditProfile: (bool) => set({ editProfile: bool }),
   setRelyToMessage: (message) => set({ replyToMessage: message }),
   setText: (text) => set({ text: text }),
   setSearchBarOpen: (boolVal) => set({ searchBarOpen: boolVal }),
@@ -259,6 +259,7 @@ export const UseChatStore = create((set, get) => ({
     if (!socket) return;
 
     socket.off("newMessage");
+    socket.off("DeleteMsgId");
     socket.off("messagesSeenByPeer");
     socket.off("unreadCountUpdateAfterSeen");
   },

@@ -18,6 +18,7 @@ const ChatContainer = () => {
     typingUsers,
     deleteMessage,
     setRelyToMessage,
+    getMessageByUserId
   } = UseChatStore();
 
   const [hoveredToMessage, setHoveredToMessage] = useState(null);
@@ -42,10 +43,18 @@ const ChatContainer = () => {
 
   useEffect(() => {
     subscribeToMessages();
+    
+    if (!selectedUser?.id) return;
+    getMessageByUserId(selectedUser.id);
 
-    //---- CleanUp ------
+    // ------ cleanUp ------
     return () => unsubscribeToMessages();
-  }, [subscribeToMessages, unsubscribeToMessages]);
+  }, [
+    selectedUser,
+    getMessageByUserId,
+    subscribeToMessages,
+    unsubscribeToMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current) {
@@ -99,9 +108,8 @@ const ChatContainer = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`relative ${
-                  messageSelected === msg.id ? "z-50" : "z-0"
-                }`}
+                className={`relative ${messageSelected === msg.id ? "z-50" : "z-0"
+                  }`}
                 onMouseEnter={() =>
                   !messageSelected && setHoveredToMessage(msg.id)
                 }
@@ -110,9 +118,8 @@ const ChatContainer = () => {
                 }
               >
                 <div
-                  className={`relative flex flex-col ${
-                    msg.sender_id === authUser.id ? "items-end" : "items-start"
-                  }`}
+                  className={`relative flex flex-col ${msg.sender_id === authUser.id ? "items-end" : "items-start"
+                    }`}
                 >
                   {/* -------- Reply Preview (if exists) -------- */}
                   {msg.reply_to && (
@@ -126,11 +133,10 @@ const ChatContainer = () => {
                   )}
 
                   <div
-                    className={`relative max-w-[85%] sm:max-w-[70%] px-2 py-1 rounded-2xl transition-all duration-200 ${
-                      msg.sender_id === authUser.id
-                        ? `bg-[#1c2b4a] text-white rounded-br-sm ${msg.isOptimistic ? "opacity-70 -translate-x-1" : ""}`
-                        : "bg-[#1a1b1f] text-slate-200 rounded-bl-sm border border-white/5"
-                    }`}
+                    className={`relative max-w-[85%] sm:max-w-[70%] px-2 py-1 rounded-2xl transition-all duration-200 ${msg.sender_id === authUser.id
+                      ? `bg-[#1c2b4a] text-white rounded-br-sm ${msg.isOptimistic ? "opacity-70 -translate-x-1" : ""}`
+                      : "bg-[#1a1b1f] text-slate-200 rounded-bl-sm border border-white/5"
+                      }`}
                   >
                     {/*---- Image ------*/}
                     {msg.image && (
@@ -217,7 +223,7 @@ const ChatContainer = () => {
                     -------------------------------------------------- */}
                 {msg.id === lastSentMessageId && (
                   <p className="text-gray-500 text-xs text-right mt-2">
-                    {msg.is_seen
+                    {msg.isOptimistic ? "Sending..." : msg.is_seen
                       ? "Seen"
                       : `Sent at ${msgSentTime(msg.created_at)}`}
                   </p>

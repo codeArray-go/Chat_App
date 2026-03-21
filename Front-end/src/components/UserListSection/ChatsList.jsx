@@ -14,7 +14,6 @@ const ChatsList = () => {
     typingUsers,
     notifications,
     setIsSelectedUserFromList,
-    getMessageByUserId,
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
 
@@ -41,7 +40,6 @@ const ChatsList = () => {
           onClick={() => {
             setSelectedUser(chat);
             setIsSelectedUserFromList(true);
-            getMessageByUserId(chat.id);
           }}
         >
           {" "}
