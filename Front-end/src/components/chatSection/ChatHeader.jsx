@@ -10,6 +10,7 @@ function ChatHeader() {
     setSelectedUser,
     typingUsers,
     setIsSelectedUserFromList,
+    unsubscribeToMessages
   } = UseChatStore();
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(selectedUser.id);
@@ -59,6 +60,7 @@ function ChatHeader() {
         onClick={() => {
           setSelectedUser(null);
           setIsSelectedUserFromList(false);
+          unsubscribeToMessages()
         }}
       >
         <XIcon
