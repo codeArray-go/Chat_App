@@ -38,7 +38,7 @@ const MessageInput = () => {
     try {
       /* ------ Cleanup ------ */
       setText("");
-      if (replyToMessage) setRelyToMessage(null);
+      if (replyToMessage) setRelyToMessage("");
       setImgPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
 
@@ -124,7 +124,7 @@ const MessageInput = () => {
           </div>
 
           <button
-            onClick={() => setRelyToMessage(null)}
+            onClick={() => setRelyToMessage("")}
             type="button"
             className="absolute top-2 right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-700 transition"
           >
