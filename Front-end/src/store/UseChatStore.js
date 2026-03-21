@@ -99,7 +99,7 @@ export const UseChatStore = create((set, get) => ({
       set((state) => {
         const updated = { ...state.notifications };
         response.forEach((element) => {
-          updated[element.id] = element.count;
+          updated[element.sender_id] = element.unread_count;
         });
 
         return { notifications: updated };
