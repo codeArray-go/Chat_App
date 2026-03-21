@@ -73,12 +73,7 @@ io.on("connection", (socket) => {
 
       const unreadCount = (
         await pool.query(
-          `SELECT COUNT(*) FROM messages 
-                                            WHERE 
-                                              sender_id=$1 AND
-                                              receiver_id=$2 AND
-                                              is_seen=false
-                                            `,
+          `SELECT COUNT(*) FROM messages WHERE sender_id=$1 AND receiver_id=$2 AND is_seen=false`,
           [messagesender_id, myId],
         )
       ).rows[0].count;

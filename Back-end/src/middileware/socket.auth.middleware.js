@@ -41,7 +41,7 @@ export const socketAuthMiddleware = async (socket, next) => {
     socket.userId = user.id;
 
     console.log(
-      `Socket authenticated for user: ${user.full_name} (${user.id})`,
+      `Socket authenticated for user: ${user.full_name} with id: (${user.id})`,
     );
 
     next();
