@@ -3,7 +3,17 @@ import { ENV } from "../lib/env.js";
 import { pool } from "../lib/db.js";
 
 export const protectedRoute = async (req, res, next) => {
+  let token;
   try {
+  // From header (Flutter)
+  if (req.headers.authorization?.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  //  From cookie (Web)
+  else if (req.cookies?.jwt) {
+    token = req.cookies.jwt;
+  }
     const token = req.cookies.jwt;
     if (!token)
       return res
