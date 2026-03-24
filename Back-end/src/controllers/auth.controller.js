@@ -45,9 +45,10 @@ export const signup = async (req, res) => {
     const result = newUser.rows[0];
 
     if (result) {
-      genrateToken(result.id, res);
+      const token = genrateToken(result.id, res);
 
       res.status(201).json({
+        token,
         id: result.id,
         full_name: result.full_name,
         email: result.email,
