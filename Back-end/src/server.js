@@ -23,7 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoute);
 
 app.get("/api/ping", (req, res) => {
-  res.status(200).json({ message: "Server alive 🚀" });
+  res.status(200).json({ message: "Server is alive 👍🏻" });
 });
 
 const PORT = ENV.PORT;
