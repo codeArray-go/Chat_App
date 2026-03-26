@@ -14,7 +14,7 @@ export const protectedRoute = async (req, res, next) => {
   else if (req.cookies?.jwt) {
     token = req.cookies.jwt;
   }
-    const token = req.cookies.jwt;
+  
     if (!token)
       return res
         .status(401)
