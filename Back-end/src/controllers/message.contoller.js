@@ -2,31 +2,6 @@ import cloudinary from "../lib/cloudinary.js";
 import { pool } from "../lib/db.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
-export const getAllContacts = async (req, res) => {
-  try {
-    const loggedInUserId = req.user.id;
-    const filtere = await pool.query(
-      `SELECT 
-        u.id, 
-        u.full_name, 
-        u.email, 
-        u.profile_pic 
-      FROM users u
-      LEFT JOIN messages m ON u.id = m.sender_id
-      WHERE u.id !=$1
-      ORDER BY m.created_at DESC;`,
-      [loggedInUserId],
-    );
-
-    const filteredUsers = filtere.rows;
-
-    res.status(200).json(filteredUsers);
-  } catch (error) {
-    console.log("Error in gettingAllContacts: ", error);
-    res.status(500).json({ message: "Server error." });
-  }
-};
-
 export const getMessagesByUserId = async (req, res) => {
   try {
     const myId = req.user.id;
@@ -38,7 +13,7 @@ export const getMessagesByUserId = async (req, res) => {
         `
           SELECT * FROM messages 
           WHERE 
-          (sender_id=$1 AND receiver_id=$2) OR (sender_id=$2 AND receiver_id=$1)
+          (sender_id=$1 AND receiver_id=$2) OR (sender_id=$2 AND receiver_id=$1) ORDER BY created_at ASC
         `,
         [myId, userToChatId],
       )
@@ -57,7 +32,6 @@ export const searchUser = async (req, res) => {
     console.log(query);
 
     if (!query) return;
-
 
     const searchQuery = (
       await pool.query(
@@ -89,12 +63,12 @@ export const sendMessage = async (req, res) => {
     const receiverExists = await pool.query(`SELECT 1 FROM users WHERE id=$1`, [
       receiver_id,
     ]);
-    if (!receiverExists) {
+    if (receiverExists.rows.length === 0) {
       return res.status(404).json({ message: "Receiver not found." });
     }
 
     let imageUrl;
-    if (image) {
+    if (image && image.trim() !== "") {
       const uploadToCloudinary = await cloudinary.uploader.upload(image);
       imageUrl = uploadToCloudinary.secure_url;
     }
@@ -126,7 +100,7 @@ export const sendMessage = async (req, res) => {
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMesssage: ", error.message);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error.", error });
   }
 };
 
@@ -158,27 +132,27 @@ export const getChatParameter = async (req, res) => {
     const loggedInUserId = req.user.id;
 
     // --------- Fetch user IDs that have chatted with the logged-in user ---------
-    const chatPartenersId = (
-      await pool.query(
-        `SELECT DISTINCT
-          CASE
-            WHEN sender_id = $1 THEN receiver_id
-            ELSE sender_id
-          END AS partner_id
-        FROM messages
-        WHERE sender_id = $1 OR receiver_id = $1`,
-        [loggedInUserId],
+    const queryResponse = await pool.query(
+      `SELECT DISTINCT ON (u.id)
+        u.id,
+        u.full_name,
+        u.email,
+        u.profile_pic,
+        m.text,
+        m.created_at,
+        (m.sender_id = $1) AS is_me
+      FROM users u
+      JOIN messages m 
+      ON (
+        (m.sender_id = $1 AND m.receiver_id = u.id)
+        OR 
+        (m.sender_id = u.id AND m.receiver_id = $1)
       )
-    ).rows.map((row) => row.partner_id);
-
-    if (chatPartenersId.length === 0) return res.json([]);
-
-    const chatParteners = (
-      await pool.query(
-        `SELECT id, full_name, email, profile_pic FROM users WHERE id=ANY($1)`,
-        [chatPartenersId],
-      )
-    ).rows;
+      WHERE u.id != $1
+      ORDER BY u.id, m.created_at DESC;`,
+      [loggedInUserId],
+    );
+    const chatParteners = queryResponse.rows;
 
     res.status(200).json(chatParteners);
   } catch (error) {
