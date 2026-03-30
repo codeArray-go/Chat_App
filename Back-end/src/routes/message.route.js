@@ -2,7 +2,6 @@ import express from "express";
 import { arcjetProtection } from "../middileware/arcjet.middleware.js";
 import { protectedRoute } from "../middileware/auth.middleware.js";
 import {
-  getAllContacts,
   getMessagesByUserId,
   sendMessage,
   getChatParameter,
@@ -13,10 +12,8 @@ import {
 
 const router = express.Router();
 
-// router.use(arcjetProtection, protectedRoute);
-router.use(protectedRoute);
+router.use(arcjetProtection, protectedRoute);
 
-router.get("/contacts", getAllContacts);
 router.get("/chats", getChatParameter);
 router.get("/search", searchUser);
 router.get("/getNoti", getNotification);
