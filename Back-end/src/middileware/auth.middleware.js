@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../lib/env.js";
-import { pool } from "../lib/db.js";
+import { pool } from "../lib/pool.js";
 
 export const protectedRoute = async (req, res, next) => {
   let token;

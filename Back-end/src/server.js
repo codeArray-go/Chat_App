@@ -5,7 +5,7 @@ import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
-import { createTables } from "./models/Table.js";
+import { createTables } from "./lib/Schema.js";
 
 // const __dirname = path.resolve();
 

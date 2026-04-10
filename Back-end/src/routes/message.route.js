@@ -4,17 +4,17 @@ import { protectedRoute } from "../middileware/auth.middleware.js";
 import {
   getMessagesByUserId,
   sendMessage,
-  getChatParameter,
   getNotification,
   searchUser,
   deleteMessage,
+  getChatPartners,
 } from "../controllers/message.contoller.js";
 
 const router = express.Router();
 
 router.use(arcjetProtection, protectedRoute);
 
-router.get("/chats", getChatParameter);
+router.get("/chats", getChatPartners);
 router.get("/search", searchUser);
 router.get("/getNoti", getNotification);
 router.post("/delete", deleteMessage);
