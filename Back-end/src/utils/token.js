@@ -11,6 +11,7 @@ export const genrateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
+/*
   // FOR DEVELOPMENT :-
   res.cookie("jwt", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -18,8 +19,8 @@ export const genrateToken = (userId, res) => {
     sameSite: "strict",
     path: "/",
   });
+*/
 
-  /*
   // FOR PRODUCTION:-
   res.cookie("jwt", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -28,7 +29,7 @@ export const genrateToken = (userId, res) => {
     secure: true,
     path: "/",
   });
-  */
+
 
   return token;
 };
