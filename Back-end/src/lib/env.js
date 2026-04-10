@@ -10,6 +10,7 @@ export const ENV = {
   NODE_ENV: process.env.NODE_ENV,
 
   CLIENT_URL: process.env.CLIENT_URL,
+  CLIENT_URL_2: process.env.CLIENT_URL_2,
 
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
