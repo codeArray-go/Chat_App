@@ -228,7 +228,6 @@ export const UseChatStore = create((set, get) => ({
           [sender]: count,
         },
       }));
-      console.log("notification updated");
     });
   },
 
