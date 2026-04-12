@@ -56,7 +56,7 @@ export const sendMessageService = async (
 };
 
 export const deleteMessageService = async ({ message_id, myId }) => {
-  const Delete = deleteMessageRepo({ message_id, myId });
+  const Delete = await deleteMessageRepo({ message_id, myId });
 
   const receiverSocketId = getReceiverSocketId(Delete.receiver_id);
   if (receiverSocketId) {

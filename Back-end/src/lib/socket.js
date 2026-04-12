@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
         io.to(senderSocketId).emit("messagesSeenByPeer", myId);
       }
 
-      const unreadCount = unreadeCountRepo({
+      const unreadCount = await unreadeCountRepo({
         sender_id: messagesender_id,
         receiver_id: myId,
       });

@@ -27,7 +27,7 @@ export const updateSeenStatusRepo = async ({ messagesender_id, myId }) => {
 
 export const unreadeCountRepo = async ({ sender_id, receiver_id }) => {
   const response = await pool.query(
-    `SELECT COUNT(*) FROM messages WHERE sender_id=$1 AND receiver_id=$2 AND is_seen=false`,
+    `SELECT COUNT(id) FROM messages WHERE sender_id=$1 AND receiver_id=$2 AND is_seen=false`,
     [sender_id, receiver_id],
   );
 
