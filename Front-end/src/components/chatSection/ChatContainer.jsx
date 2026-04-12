@@ -36,7 +36,6 @@ const ChatContainer = () => {
       socket.emit("markMessagesAsSeen", {
         messagesender_id: selectedUser.id,
         myId: authUser.id,
-        lastSeenMessageId: lastMsg.id,
       });
     }
   }, [messages, selectedUser, socket, authUser]);
