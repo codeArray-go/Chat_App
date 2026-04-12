@@ -1,10 +1,20 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../lib/env.js";
-import { pool } from "../lib/db.js";
+import { pool } from "../lib/pool.js";
 
 export const protectedRoute = async (req, res, next) => {
+  let token;
   try {
-    const token = req.cookies.jwt;
+  // From header (Flutter)
+  if (req.headers.authorization?.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  //  From cookie (Web)
+  else if (req.cookies?.jwt) {
+    token = req.cookies.jwt;
+  }
+  
     if (!token)
       return res
         .status(401)

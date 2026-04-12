@@ -1,4 +1,4 @@
-import { pool } from "../lib/db.js";
+import { pool } from "./pool.js";
 
 export const createTables = async () => {
   await pool.query(`

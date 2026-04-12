@@ -1,15 +1,22 @@
 import jwt from "jsonwebtoken";
-// import User from "../models/Table.js";
 import { ENV } from "../lib/env.js";
-import { pool } from "../lib/db.js";
+import { pool } from "../lib/pool.js";
 
 export const socketAuthMiddleware = async (socket, next) => {
   try {
+    let token;
+    // Token from flutter
+    if (socket.handshake.headers.authorization?.startsWith("Bearer ")) {
+      token = socket.handshake.headers.authorization.split(" ")[1];
+    }
+
     // extract token from http-only cookies
-    const token = socket.handshake.headers.cookie
-      ?.split("; ")
-      .find((row) => row.startsWith("jwt="))
-      ?.split("=")[1];
+    if (socket.handshake.headers.cookie) {
+      token = socket.handshake.headers.cookie
+        ?.split("; ")
+        .find((row) => row.startsWith("jwt="))
+        ?.split("=")[1];
+    }
 
     if (!token) {
       console.log("Socket connection rejected: No token provided");
