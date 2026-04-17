@@ -17,9 +17,9 @@ export const signUpService = async ({ full_name, email, password }, res) => {
   const error = ValidatorForSignUp({ full_name, email, password });
   if (error) throw new Error(error);
 
-  const existingUser = extingEmailCheckRepo(email);
+  const existingUser = await extingEmailCheckRepo(email);
 
-  if (existingUser.length > 0) {
+  if (existingUser) {
     return "User already existing, try creating with different email address.";
   }
 
@@ -27,13 +27,13 @@ export const signUpService = async ({ full_name, email, password }, res) => {
   const createdUser = await createNewUserRepo({ full_name, email, hashedPass });
 
   if (createdUser) {
-    const token = genrateToken(result.id, res);
+    const token = genrateToken(createdUser.id, res);
     const data = {
       token,
-      id: result.id,
-      full_name: result.full_name,
-      email: result.email,
-      profile_pic: result.profile_pic,
+      id: createdUser.id,
+      full_name: createdUser.full_name,
+      email: createdUser.email,
+      profile_pic: createdUser.profile_pic,
     };
     return data;
   }
