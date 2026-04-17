@@ -33,7 +33,7 @@ export const searchUser = async (req, res) => {
     if (error)
       return res.status(404).json({ message: "no search query entered." });
 
-    const searchQuery = searchQueryRepo({ query });
+    const searchQuery = await searchQueryRepo({ query });
 
     res.status(200).json(searchQuery);
   } catch (error) {
