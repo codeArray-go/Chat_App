@@ -36,4 +36,20 @@ export const createTables = async () => {
       CHECK (text IS NOT NULL OR image IS NOT NULL)
     );
   `);
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_users_full_name ON users (full_name);`,
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages (sender_id);`,
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages (receiver_id);`,
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages (created_at DESC);`,
+  );
 };

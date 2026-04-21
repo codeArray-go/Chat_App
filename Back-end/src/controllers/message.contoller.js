@@ -92,7 +92,7 @@ export const deleteMessage = async (req, res) => {
   try {
     if (!message_id) return;
 
-    await deleteMessageService({message_id, myId});
+    await deleteMessageService({ message_id, myId });
 
     res.status(200).json({ message: "Message deleted successfully." });
   } catch (error) {

@@ -27,3 +27,11 @@ export const updateProfilePicRepo = async ({ url, userId }) => {
   );
   return response.rows;
 };
+
+export const updateProfileNameRepo = async ({newName, id}) => {
+  const res = await pool.query(`
+    UPDATE users SET full_name=$1 WHERE id=$2 RETURNING full_name;
+  `, [newName, id]);
+
+  return res.rows;
+}
