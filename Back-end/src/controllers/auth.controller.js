@@ -1,3 +1,4 @@
+import { updateProfileNameRepo } from "../repositories/auth.repository.js";
 import {
   loginService,
   signUpService,
@@ -47,3 +48,16 @@ export const updateProfilePic = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateProfileName = async (req, res) => {
+  const {newName} = req.body;
+  const id = req.user.id;
+
+  try{
+    const result = await updateProfileNameRepo({newName, id});
+    res.status(200).json(result);
+  }catch(error){
+    console.error(error);
+    res.status(500).json({message: "Internal server error."});
+  }
+}
