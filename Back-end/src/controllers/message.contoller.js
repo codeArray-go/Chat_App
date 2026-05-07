@@ -27,7 +27,6 @@ export const getMessagesByUserId = async (req, res) => {
 export const searchUser = async (req, res) => {
   try {
     const { query } = req.query;
-    console.log(query);
 
     const error = ValidatorforSearchQuery({ query });
     if (error)
